@@ -1,0 +1,48 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'com.tailwag.dogmatch'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.tailwag.dogmatch"
+        minSdk 24
+        targetSdk 34
+        versionCode 3
+        versionName "1.2.1"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.webkit:webkit:1.10.0'
+}
+
+tasks.register('verifyWebAssets') {
+    doLast {
+        if (!file('src/main/assets/index.html').exists()) {
+            throw new GradleException('Bundled web assets missing. Run npm run build from the repository root first.')
+        }
+    }
+}
+tasks.named('preBuild').configure { dependsOn 'verifyWebAssets' }

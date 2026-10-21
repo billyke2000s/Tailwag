@@ -1,0 +1,6 @@
+{
+  "name": "TailWag - Android Dog Matching & Playdates",
+  "description": "The premier Android matching service for dogs. Swipe to discover nearby playmates, schedule dog park meetups, and find your pup's best friend.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

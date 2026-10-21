@@ -1,0 +1,39 @@
+name: Bug report
+description: Report a reproducible problem in the repair edition.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: "Please use sample data and keep credentials or personal information out of the report."
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v1.2.1 or a commit SHA
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Device and environment
+      placeholder: Android device/OS or browser/version
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open…\n2. Tap…\n3. Observe…"
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Error text or screenshots
+      description: Remove private information before sharing.

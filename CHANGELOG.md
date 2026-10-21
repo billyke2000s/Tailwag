@@ -1,0 +1,82 @@
+# Changelog
+
+## 1.2.1 — Community repair edition
+
+- Publish a clearly attributed repair edition for a mate's original project.
+- Include upstream dog/cat features through f993919.
+- Preserve local profiles, conversations, discovery history, check-ins and preferences.
+- Repair bundled photos, filters, rapid swipes, rewind, meetup shortcuts, status labels and Android Back.
+- Add complete Android build files, bundled frontend assets and canonical project export.
+- Add verified regression coverage, documentation navigation, issue/PR templates and preview-release automation.
+- Keep intentional test content and offline text generation.
+
+ (CHANGELOG.md)
+
+All notable changes to the **TailWag** project will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [1.2.0] - 2026-10-21
+
+### Added
+- **Compiled & Signed Android APK Binary (`public/tailwag.apk` & `dist/tailwag.apk`)**:
+  - Full local Android toolchain integration (`aapt`, `dalvik-exchange`, `javac`, `zipalign`, and `apksigner`).
+  - Automated compilation pipeline via `scripts/build_apk.sh` producing signed 69KB standalone APK.
+  - One-click direct APK download button inside the in-app Android Installation Hub.
+  - `"build:apk"` npm script in `package.json`.
+
+---
+
+## [1.1.0] - 2026-10-21
+
+### Added
+- **Native Android Project Repository (`/android`)**:
+  - `android/app/src/main/AndroidManifest.xml` targeting SDK 34 (Android 14) with permissions for network and vibration.
+  - `android/app/build.gradle` and root Gradle configuration files.
+  - `MainActivity.java` AndroidX WebView host.
+- **PWA & WebAPK Infrastructure**:
+  - `vite-plugin-pwa` configuration with standalone display and portrait lock in `vite.config.ts`.
+  - Service worker asset precaching (`dist/sw.js`).
+  - Standard and maskable PNG icons (`pwa-192x192.png`, `pwa-512x512.png`, `pwa-maskable-512x512.png`, and `apple-touch-icon.png`).
+  - Programmatic icon generator script using `sharp` (`scripts/generate_icons.js`).
+- **In-App Android APK & Installation Hub (`AndroidInstallModal.tsx`)**:
+  - Direct 1-click WebAPK installation trigger for Android Chrome.
+  - Cloud 1-click APK/AAB builder integration via PWABuilder / Bubblewrap.
+  - In-browser ZIP packaging tool (`JSZip`) to download the complete ready-to-build Android Studio repository.
+- **Documentation Suite**:
+  - Added `AGENTS.md`, `README.md`, `PROJECT.md`, `SPECIFICATION.md`, `ARCHITECTURE.md`, `DEVELOPMENT.md`, `TESTING.md`, `SECURITY.md`, `STATUS.md`, `DECISIONS.md`, and `CHANGELOG.md`.
+
+---
+
+## [1.0.0] - 2026-10-21
+
+### Added
+- **Discovery Deck & Swipe Physics**:
+  - Swipable dog profile cards powered by `motion/react` with drag physics.
+  - Tactile action triggers: Pass, Like, Super Bark, Rewind, and Detail Sheet.
+  - Unboxed metadata styling complying with the Frontend Design Constitution.
+- **Match Celebrations & Chat**:
+  - Dual avatar match modal with `canvas-confetti` fireworks.
+  - Real-time conversation thread simulation with auto-reply engine.
+  - Structured in-chat playdate invitation scheduler.
+- **Local Dog Parks Live Radar**:
+  - Real-time dog headcount tracker and avatar roster for checked-in pups.
+  - One-tap check-in/check-out coordinator.
+  - Amenities and security fencing specifications.
+- **Canine AI Wingman Studio**:
+  - Bark-o-Matic Bio Studio powered by `@google/genai` (with zero-delay offline fallbacks).
+  - Dynamic 2-dog playstyle compatibility calculator.
+  - Humorous Bark-to-Human speech translator.
+- **Android System Simulation & Audio**:
+  - Google Pixel 9 Pro device frame with status bar (live clock, 5G, battery indicator) and Material 3 bottom navigation.
+  - Web Audio API synthesizer for natural canine barks and match chimes.
+
+## 1.2.0 — 2026-10-21
+
+- Repair production/offline test images for dogs and cats.
+- Add validated local persistence, ID-based discovery/check-ins and shared sound/alert preferences.
+- Fix filter reconciliation, rapid swipes, rewind, unread state and meetup context.
+- Make health/verification labels data-driven and add modal Back/focus handling.
+- Replace browser provider-key access with local demo generators.
+- Add Gradle wrapper/resources, bundled Android assets, canonical project export and build/test CI.
+- Replace the obsolete preview-loading APK with reproducible debug-build outputs.

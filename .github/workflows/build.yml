@@ -1,0 +1,95 @@
+name: Test, build and release
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tailwag-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    name: Verify web and Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Read and validate package version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 1
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+        env:
+          VITE_APK_URL: https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/TailWag-${{ steps.version.outputs.version }}-debug.apk
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager 'platforms;android-34' 'build-tools;34.0.0'
+      - name: Build debug APK
+        run: chmod +x android/gradlew && cd android && ./gradlew --no-daemon assembleDebug
+      - name: Check APK signature and package release assets
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose android/app/build/outputs/apk/debug/app-debug.apk
+          mkdir release
+          cp android/app/build/outputs/apk/debug/app-debug.apk "release/TailWag-$VERSION-debug.apk"
+          cp dist/TailWag-Android-Project.zip release/
+          cd release
+          sha256sum *.apk *.zip > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TailWag-${{ steps.version.outputs.version }}-test-build
+          path: release/*
+          if-no-files-found: error
+      - name: Preserve failed browser traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-failure-traces
+          path: test-results/
+          if-no-files-found: ignore
+  release:
+    name: Publish preview release
+    needs: verify
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: TailWag-${{ needs.verify.outputs.version }}-test-build
+          path: release
+      - name: Publish once for this version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.verify.outputs.version }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          TAG="v$VERSION"
+          if gh release view "$TAG" --repo "$REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; preserving its published assets."
+            exit 0
+          fi
+          NOTES="docs/releases/$TAG.md"
+          test -f "$NOTES"
+          gh release create "$TAG" release/* --repo "$REPOSITORY" --target "$GITHUB_SHA" --prerelease --title "TailWag $VERSION · Community repair preview" --notes-file "$NOTES"

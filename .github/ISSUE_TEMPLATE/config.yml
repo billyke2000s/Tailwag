@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Setup and troubleshooting
+    url: https://github.com/billyke2000s/Tailwag/blob/main/SUPPORT.md
+    about: Check setup requirements and common installation issues.
+  - name: Original project
+    url: https://github.com/fpr8653-afk/tailwag
+    about: The original app and idea belong to fpr8653-afk.
