@@ -21,4 +21,28 @@ if asm3.dbupdate.check_for_updates(core) or asm3.dbupdate.check_for_view_seq_cha
     core
 ):
     raise SystemExit("Schema remains pending after upgrade")
-print("Core schema current")
+# Idempotent adapter data upgrade: preserve existing forms and their decisions.
+import asm3.onlineform, asm3.utils
+from shelter.core import FORM_NAMES
+
+for name in FORM_NAMES.values():
+    formid = core.query_int("SELECT ID FROM onlineform WHERE Name = ?", [name])
+    if formid and not core.query_int(
+        "SELECT COUNT(*) FROM onlineformfield WHERE OnlineFormID = ? AND FieldName = 'reference'",
+        [formid],
+    ):
+        asm3.onlineform.insert_onlineformfield_from_form(
+            core,
+            "platform-upgrade",
+            asm3.utils.PostedData(
+                {
+                    "formid": str(formid),
+                    "fieldname": "reference",
+                    "fieldtype": "0",
+                    "label": "Public receipt reference",
+                    "displayindex": "99",
+                },
+                core.locale,
+            ),
+        )
+print("Core schema and adapter form metadata current")

@@ -28,6 +28,7 @@ subprocess.run([sys.executable, "scripts/configure.py"], check=True)
 subprocess.run([sys.executable, "manage.py", "migrate"], check=True)
 if not (root / "runtime/core.sqlite3").exists():
     subprocess.run([sys.executable, "scripts/bootstrap.py"], check=True)
+subprocess.run([sys.executable, "scripts/upgrade-core.py"], check=True)
 if "--seed" in sys.argv:
     os.environ["DEMO_DATA"] = "true"
     subprocess.run([sys.executable, "scripts/seed-demo.py"], check=True)

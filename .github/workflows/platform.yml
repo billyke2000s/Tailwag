@@ -79,3 +79,40 @@ jobs:
         with:
           name: synthetic-platform-screens
           path: docs/assets/platform/
+
+      - name: Package operational candidate source
+        if: github.event_name == 'push'
+        run: |
+          mkdir release-care
+          tar --exclude='platform/runtime' --exclude='platform/staticfiles' --exclude='__pycache__' --exclude='*.pyc' --exclude='*.sqlite3' --exclude='*.db' --exclude='.env' -czf release-care/TailWag-Care-0.1.0-alpha.1-source.tar.gz platform README.md PROJECT.md SPECIFICATION.md ARCHITECTURE.md DEVELOPMENT.md TESTING.md DEPLOYMENT.md SECURITY.md STATUS.md DECISIONS.md THIRD-PARTY.md CREDITS.md docs/RESEARCH.md docs/REUSE.md docs/FEATURE-INVENTORY.md docs/LAUNCH-READINESS.md docs/VERIFICATION.md docs/operations
+          cd release-care
+          sha256sum *.tar.gz > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push'
+        with:
+          name: operational-candidate-source
+          path: release-care/
+  candidate-release:
+    name: Publish operational evaluation candidate
+    needs: platform
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/feature/shelter-platform' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: operational-candidate-source
+          path: release-care
+      - name: Publish candidate once after verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          TAG=care-v0.1.0-alpha.1
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo 'Candidate already published; preserving its revision and assets.'
+            exit 0
+          fi
+          gh release create "$TAG" release-care/* --target "$GITHUB_SHA" --prerelease --title 'TailWag Care 0.1.0-alpha.1 · Evaluation candidate' --notes-file docs/releases/care-v0.1.0-alpha.1.md

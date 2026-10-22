@@ -96,7 +96,7 @@ FORM_NAMES = {
 }
 
 
-def submit(kind, data, animal_name, remote_ip, user_agent):
+def submit(kind, data, animal_name, remote_ip, user_agent, reference=""):
     dbo = database()
     if not any(
         f["NAME"] == FORM_NAMES[kind] for f in asm3.onlineform.get_onlineforms(dbo)
@@ -110,6 +110,7 @@ def submit(kind, data, animal_name, remote_ip, user_agent):
         "message": data["message"],
         "animalname": animal_name,
         "privacy": "Acknowledged",
+        "reference": reference,
         "capacity": data.get("capacity", ""),
         "species": data.get("species", ""),
     }

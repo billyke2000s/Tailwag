@@ -94,6 +94,7 @@ for name in FORM_NAMES.values():
                 ("capacity", "Household and capacity"),
                 ("species", "Species"),
                 ("privacy", "Privacy acknowledgement"),
+                ("reference", "Public receipt reference"),
             ]
         )
     ]

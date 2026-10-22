@@ -67,7 +67,7 @@ try {
     run(args);
   run([
     "-c",
-    "from shelter.core import database; import asm3.users,asm3.utils; d=database(); r=d.query_int(\"SELECT ID FROM role WHERE RoleName = 'Volunteer'\"); u=asm3.users.insert_user_from_form(d,'browser-test',asm3.utils.PostedData({'username':'synthetic-volunteer','realname':'Synthetic test volunteer','password':__import__('os').environ['ADMIN_PASSWORD'],'roles':str(r)},'en_GB')); d.update('users',u,{'EnableTOTP':1,'OTPSecret':'JBSWY3DPEHPK3PXP'})",
+    "from shelter.core import database; import asm3.users,asm3.utils,os; d=database(); roles=['Care team','Veterinary team','Placement team','Volunteer','Finance']; [(lambda r: d.update('users',asm3.users.insert_user_from_form(d,'browser-test',asm3.utils.PostedData({'username':'synthetic-'+r.lower().split()[0],'realname':'Synthetic role test','password':os.environ['ADMIN_PASSWORD'],'roles':str(d.query_int('SELECT ID FROM role WHERE RoleName = ?',[r]))},'en_GB')),{'EnableTOTP':1,'OTPSecret':'JBSWY3DPEHPK3PXP'}))(r) for r in roles]",
   ]);
   for (const [port, app] of [
     [8000, "shelter.wsgi:application"],
@@ -218,37 +218,58 @@ try {
         )}`,
       );
   }
-  const restricted = await browser.newContext();
-  const volunteer = await restricted.newPage();
-  await volunteer.goto("http://localhost:5000/login");
-  await volunteer.locator("#username").fill("synthetic-volunteer");
-  await volunteer.locator("#password").fill(password);
-  await volunteer.locator("#loginbutton").click();
-  await volunteer.locator("#onetimepass").waitFor();
-  await volunteer.locator("#onetimepass").fill(otp("JBSWY3DPEHPK3PXP"));
-  await volunteer.locator("#loginbutton").click();
-  await volunteer.waitForURL(/main/);
-  for (const route of [
+  let roleBoundaries = 0;
+  const matrix = {
+    care: [200, 403, 200, 403, 403, 403, 403],
+    veterinary: [200, 403, 200, 403, 403, 403, 403],
+    placement: [200, 200, 403, 200, 403, 403, 403],
+    volunteer: [200, 403, 403, 403, 403, 403, 403],
+    finance: [403, 403, 403, 403, 403, 403, 200],
+  };
+  const routes = [
+    "animal?id=1",
     "person_find",
-    "person_new",
+    "animal_medical?id=1",
+    "animal_movements?id=1",
     "systemusers",
     "sql",
     "reports",
-    "animal_medical?id=1",
-    "animal_movements?id=1",
-  ]) {
-    const response = await restricted.request.get(
-      `http://localhost:5000/${route}`,
-    );
-    if (response.status() !== 403)
-      throw Error(`Volunteer boundary ${route}: ${response.status()}`);
+  ];
+  for (const [role, statuses] of Object.entries(matrix)) {
+    const context = await browser.newContext();
+    await context.request.get("http://localhost:5000/login");
+    const login = await context.request.post("http://localhost:5000/login", {
+      headers: { Origin: "http://localhost:5000" },
+      form: {
+        username: "synthetic-" + role,
+        password,
+        onetimepass: otp("JBSWY3DPEHPK3PXP"),
+      },
+    });
+    const loginText = await login.text();
+    if (
+      login.status() !== 200 ||
+      ["FAIL", "ASK2FA", "BAD2FA"].includes(loginText.trim())
+    )
+      throw Error("Role sign-in failed: " + role);
+    for (let i = 0; i < routes.length; i++) {
+      const response = await context.request.get(
+        "http://localhost:5000/" + routes[i],
+      );
+      if (response.status() !== statuses[i])
+        throw Error(
+          `Role boundary ${role} ${routes[i]}: ${response.status()} expected ${statuses[i]}`,
+        );
+      roleBoundaries++;
+    }
+    const denied = await context.request.post("http://localhost:5000/sql", {
+      headers: { Origin: "http://localhost:5000" },
+      form: { mode: "exec", sql: "SELECT 1" },
+    });
+    if (denied.status() !== 403) throw Error("SQL write boundary: " + role);
+    roleBoundaries++;
+    await context.close();
   }
-  const denied = await restricted.request.post("http://localhost:5000/sql", {
-    headers: { Origin: "http://localhost:5000" },
-    form: { mode: "exec", sql: "SELECT 1" },
-  });
-  if (denied.status() !== 403) throw Error("Volunteer SQL write boundary");
-  await restricted.close();
   const forbidden = await page.request.post("http://localhost:5000/login", {
     headers: { Origin: "https://untrusted.example" },
     form: { username: "care-admin", password: "invalid" },
@@ -261,7 +282,7 @@ try {
       keyboardSkip: "passed",
       staffLoginAndTOTP: "passed",
       staffViewports: 3,
-      volunteerBoundaries: 8,
+      roleBoundaries,
       reviewedDailyJobs: "passed",
       foreignOrigin: "blocked",
     }),

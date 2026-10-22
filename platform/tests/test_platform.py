@@ -141,6 +141,13 @@ class PlatformTests(TestCase):
             self.assertEqual(response.status_code, 200)
             receipt = Receipt.objects.get(kind=kind)
             self.assertEqual(receipt.state, "sent")
+            self.assertEqual(
+                self.dbo.query_string(
+                    "SELECT Value FROM onlineformincoming WHERE CollationID = ? AND FieldName = 'reference'",
+                    [receipt.core_id],
+                ),
+                str(receipt.id),
+            )
             self.assertTrue(
                 self.dbo.query(
                     "SELECT CollationID FROM onlineformincoming WHERE CollationID = ?",

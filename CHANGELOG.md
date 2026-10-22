@@ -9,6 +9,8 @@
 - Add source-backed England research, reuse/feature inventory, operational guides and explicit launch evidence gates.
 - Preserve the independent original prototype and v1.2.1 APK; no production deployment or operational-readiness claim.
 
+Historical prototype entries below describe their respective revisions and are not claims about current operational capabilities.
+
 ## 1.2.1 — Community repair edition
 
 - Publish a clearly attributed repair edition for a mate's original project.

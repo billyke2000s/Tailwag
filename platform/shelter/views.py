@@ -188,6 +188,7 @@ def apply(request, kind):
                         pet["name"] if pet else "",
                         request.META.get("REMOTE_ADDR", ""),
                         request.META.get("HTTP_USER_AGENT", ""),
+                        reference=str(receipt.id),
                     )
                 if not core_id or not core.database().query(
                     "SELECT CollationID FROM onlineformincoming WHERE CollationID = ?",
