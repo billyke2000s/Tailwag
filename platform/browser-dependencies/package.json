@@ -2,5 +2,5 @@
   "name": "tailwag-native-browser-inventory",
   "private": true,
   "description": "Advisory inventory; runtime assets are integrity-pinned by ../browser-assets.json",
-  "dependencies": {"jquery": "3.7.1", "jquery-ui": "1.14.2", "moment": "2.31.0", "tinymce": "8.10.0"}
+  "dependencies": {"jquery": "4.0.0", "jquery-ui": "1.14.2", "moment": "2.31.0", "tinymce": "8.10.0"}
 }
