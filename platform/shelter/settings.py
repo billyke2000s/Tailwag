@@ -100,3 +100,7 @@ LOGGING = {
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "root": {"handlers": ["console"], "level": "WARNING"},
 }
+
+# Preload is a separate domain-owner commitment, not a deployment prerequisite.
+# Do not advertise preload before the organisation selects and reviews its domain.
+SILENCED_SYSTEM_CHECKS = ["security.W021"]

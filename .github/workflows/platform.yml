@@ -2,7 +2,9 @@ name: Shelter platform checks
 on:
   push:
     branches: [main, 'feature/**']
+    paths-ignore: ['**/*.md', 'docs/assets/**']
   pull_request:
+    paths-ignore: ['**/*.md', 'docs/assets/**']
   workflow_dispatch:
 permissions:
   contents: read
@@ -84,7 +86,7 @@ jobs:
         if: github.event_name == 'push'
         run: |
           mkdir release-care
-          tar --exclude='platform/runtime' --exclude='platform/staticfiles' --exclude='__pycache__' --exclude='*.pyc' --exclude='*.sqlite3' --exclude='*.db' --exclude='.env' -czf release-care/TailWag-Care-0.1.0-alpha.1-source.tar.gz platform README.md PROJECT.md SPECIFICATION.md ARCHITECTURE.md DEVELOPMENT.md TESTING.md DEPLOYMENT.md SECURITY.md STATUS.md DECISIONS.md THIRD-PARTY.md CREDITS.md docs/RESEARCH.md docs/REUSE.md docs/FEATURE-INVENTORY.md docs/LAUNCH-READINESS.md docs/VERIFICATION.md docs/operations
+          tar --exclude='platform/runtime' --exclude='platform/staticfiles' --exclude='__pycache__' --exclude='*.pyc' --exclude='platform/vendor/asm/scripts/schema/schema.db' --exclude='.env' -czf release-care/TailWag-Care-0.1.0-alpha.1-source.tar.gz platform README.md PROJECT.md SPECIFICATION.md ARCHITECTURE.md DEVELOPMENT.md TESTING.md DEPLOYMENT.md SECURITY.md STATUS.md DECISIONS.md THIRD-PARTY.md CREDITS.md docs/RESEARCH.md docs/REUSE.md docs/FEATURE-INVENTORY.md docs/LAUNCH-READINESS.md docs/VERIFICATION.md docs/operations
           cd release-care
           sha256sum *.tar.gz > SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
