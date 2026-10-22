@@ -12,6 +12,9 @@ import asm3.dbupdate, asm3.configuration, asm3.users, asm3.onlineform, asm3.repo
 password = os.environ.get("ADMIN_PASSWORD", "")
 if len(password) < 16:
     raise SystemExit("ADMIN_PASSWORD must be at least 16 characters")
+from shelter.accounts import validate_password
+
+validate_password(password)
 dbo = database(configured=False)
 try:
     existing = dbo.query("SELECT ID FROM users")

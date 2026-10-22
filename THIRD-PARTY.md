@@ -11,3 +11,7 @@
 This repository is an adaptation and improvement for a friend. It does not claim authorship of the original TailWag idea/files or ASM. Local native modifications are documented in platform/scripts/patch-core.py, platform/shelter/safety.py and ARCHITECTURE.md. The operational image contains the exact fetched source and modifications. Distribution must include applicable corresponding source and licence notices. No original prototype photos are reused as real shelter animals; platform demonstrations are explicitly synthetic illustrations.
 
 Python dependency versions are locked in platform/requirements.txt; npm dependencies retain their original package licences. Review new dependencies and copied code before adoption. This inventory is not a legal opinion or a claim that every inherited asset has been independently cleared.
+
+## Reviewed browser replacements
+
+TinyMCE 8.10.0 is used under GPL v2 or later in this GPL-3.0 operational platform. Its complete pinned project source and notices are fetched alongside the runtime distribution. jQuery, jQuery UI and Moment retain MIT notices. Asset/source pins and migration details are in docs/BROWSER-LIBRARIES.md and platform/browser-assets.json. This does not change inherited prototype licensing.

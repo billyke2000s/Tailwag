@@ -11,4 +11,4 @@ def logmsg(level, msg, location, dbo):
 
 
 asm3.al.logmsg = logmsg
-from . import safety
+from . import safety, accounts

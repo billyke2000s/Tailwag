@@ -19,3 +19,7 @@ The first CI run used the earlier 24-test suite and a weaker staff browser asser
 The stricter browser rerun inspected the actual enrolled dashboard and fixed footer overflow. Permission denial now returns HTTP 403 rather than the native misleading HTTP 500. The daily-job smoke exposed and fixed an int/string view-version mismatch. Automatic native deletion, audit pruning, anonymisation, hold expiry and publishing are excluded from the reviewed task list. The production-settings container start is a new CI check and remains pending.
 
 Public receipt references are now retained in the native incoming form fields as well as technical metadata, so staff can reconcile an uncertain write using the exact reference. The integration suite checks that link for all four enquiry types.
+
+## Browser-library remediation
+
+A separate review identified the loaded TinyMCE 5.5.1 XSS advisory. Publication was paused. Replacements are pinned in browser-assets.json and corresponding editor source is retained. Sign-in/dashboard/40 selected role boundaries passed with the replacements. Document save/reload and sanitisation checks were added and remain under verification. The four-package advisory inventory reports zero known vulnerabilities; this is not a clearance of every inherited widget or its historical build tooling. See BROWSER-LIBRARIES.md.

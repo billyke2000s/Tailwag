@@ -135,9 +135,9 @@ replace(
                 "hr anchor searchreplace visualblocks visualchars ",
                 "insertdatetime media nonbreaking table directionality",
                 "emoticons template paste"''',
-    '''                "advlist autolink lists link image charmap code",
-                "anchor searchreplace visualblocks visualchars",
-                "insertdatetime media nonbreaking table directionality emoticons"''',
+    '''                "advlist", "autolink", "lists", "link", "image", "charmap", "code",
+                "anchor", "searchreplace", "visualblocks", "visualchars",
+                "insertdatetime", "media", "nonbreaking", "table", "directionality", "emoticons"''',
 )
 replace(
     "src/static/js/document_edit.js",
@@ -145,9 +145,9 @@ replace(
             "hr anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen",
             "insertdatetime media nonbreaking save table contextmenu directionality",
             "emoticons paste textcolor save"''',
-    '''            "advlist directionality lists link image charmap preview",
-            "anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen",
-            "insertdatetime media nonbreaking save table emoticons"''',
+    '''            "advlist", "directionality", "lists", "link", "image", "charmap", "preview",
+            "anchor", "pagebreak", "searchreplace", "wordcount", "visualblocks", "visualchars", "code", "fullscreen",
+            "insertdatetime", "media", "nonbreaking", "save", "table", "emoticons"''',
 )
 replace(
     "src/static/js/document_edit.js",
@@ -160,4 +160,47 @@ replace(
             ed.ui.registry.addButton("print", { icon: "print", tooltip: "Print", onAction: function() { ed.execCommand("mcePrint"); } });
 
             // Add a PDF button""",
+)
+
+replace("src/asm3/users.py", "PBKDF2_ITERATIONS = 10000", "PBKDF2_ITERATIONS = 600000")
+replace("src/asm3/users.py", 'PBKDF2_ALGORITHM = "sha1"', 'PBKDF2_ALGORITHM = "sha256"')
+replace(
+    "src/asm3/users.py", "import os\nimport sys", "import os\nimport sys\nimport hmac"
+)
+replace(
+    "src/asm3/users.py",
+    "return asm3.utils.pbkdf2_hash_hex(plaintext, salt, algorithm, int(iterations)) == phash",
+    "return hmac.compare_digest(asm3.utils.pbkdf2_hash_hex(plaintext, salt, algorithm, int(iterations)), phash)",
+)
+# The legacy email reset changes a password on GET and emails a plaintext secret.
+# Recovery is deliberately an authenticated administrator/server operation here.
+path = root / "src/main.py"
+text = path.read_text()
+recovery_guard = '    def post_reset(self, o):\n        raise asm3.utils.ASMPermissionError("Contact the organisation administrator for account recovery")\n'
+if recovery_guard not in text:
+    start = text.index(
+        '    def post_reset(self, o):\n        dbo = asm3.db.get_database(o.post["database"])'
+    )
+    end = text.index("\nclass logout(ASMEndpoint):", start)
+    text = text[:start] + recovery_guard + text[end:]
+    path.write_text(text)
+replace(
+    "src/static/js/login.js",
+    '<span id="resetpassword" style="display: none; margin-top: 5px;"><a href="#">Reset my password</a></span>',
+    "<p>Need account recovery? Contact your organisation administrator.</p>",
+)
+path = root / "src/main.py"
+text = path.read_text()
+reset_guard = 'class reset_password(ASMEndpoint):\n    url = "reset_password"\n    check_logged_in = False\n\n    def content(self, o):\n        raise asm3.utils.ASMPermissionError("Contact the organisation administrator for account recovery")\n'
+if reset_guard not in text:
+    start = text.index("class reset_password(ASMEndpoint):")
+    end = text.index("\nclass accounts(JSONEndpoint):", start)
+    text = text[:start] + reset_guard + text[end:]
+    path.write_text(text)
+replace(
+    "src/asm3/utils.py",
+    """    hashfunc = getattr(hashlib, algorithm)
+    import asm3.pbkdf2.pbkdf23
+    return str(asm3.pbkdf2.pbkdf23.pbkdf2(hashfunc, str2bytes(plaintext), str2bytes(salt), iterations, 24).hex())""",
+    """    return hashlib.pbkdf2_hmac(algorithm, str2bytes(plaintext), str2bytes(salt), iterations, dklen=24).hex()""",
 )

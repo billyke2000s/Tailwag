@@ -260,7 +260,6 @@ try {
     .locator("body")
     .fill("Synthetic agreement saved through the real editor.");
   await editor.waitForTimeout(1100);
-  await editor.screenshot({path:'docs/assets/platform/document-editor-debug.png',fullPage:true});console.log('editor_toolbar',await editor.getByRole('button').evaluateAll(nodes=>nodes.map(n=>({label:n.getAttribute('aria-label'),title:n.getAttribute('title'),text:n.textContent?.slice(0,45)}))));
   await editor.getByRole("button", { name: /^Save/ }).click();
   await editor.waitForURL(/document_templates/);
   await editor.goto("http://localhost:5000/document_template_edit?dtid=900000");
@@ -285,6 +284,27 @@ try {
   );
   if (oldAsset.status() !== 404)
     throw Error("Vulnerable legacy asset is still served");
+  await page.goto("http://localhost:5000/change_password");
+  await page.locator("#oldpassword").fill(password);
+  const changedPassword = randomBytes(24).toString("hex");
+  await page.locator("#newpassword").fill(changedPassword);
+  await page.locator("#confirmpassword").fill(changedPassword);
+  await page.locator("#button-change").click();
+  await page
+    .getByText("Password successfully changed.", { exact: true })
+    .waitFor();
+  const revoked=await page.request.get('http://localhost:5000/main',{maxRedirects:0});if(revoked.status()!==303||!revoked.headers()['location']?.includes('/login'))throw Error('Changed password did not revoke the old session');
+  const recoveryGet = await page.request.get(
+    "http://localhost:5000/reset_password?token=synthetic",
+  );
+  if (recoveryGet.status() !== 403)
+    throw Error("Legacy recovery GET is reachable");
+  const recoveryPost = await page.request.post("http://localhost:5000/login", {
+    headers: { Origin: "http://localhost:5000" },
+    form: { mode: "reset", username: "care-admin", database: "" },
+  });
+  if (recoveryPost.status() !== 403)
+    throw Error("Legacy email recovery POST is reachable");
   let roleBoundaries = 0;
   const matrix = {
     care: [200, 403, 200, 403, 403, 403, 403],
@@ -351,6 +371,9 @@ try {
       staffViewports: 3,
       roleBoundaries,
       documentSave: "passed",
+      passwordChange: "passed",
+      credentialSessionRevocation: "passed",
+      legacyEmailRecovery: "blocked",
       editorSanitization: "passed",
       browserAssetVersions: versions,
       reviewedDailyJobs: "passed",

@@ -432,3 +432,45 @@ class PlatformTests(TestCase):
                 )
             )
         self.assertEqual(self.dbo.query_int("SELECT COUNT(*) FROM adoption"), 1)
+
+    def test_modern_hash_and_legacy_upgrade(self):
+        password = "A synthetic unique passphrase for tests!"
+        self.assertTrue(asm3.users.hash_password(password).startswith("pbkdf2:sha256:"))
+        import hashlib
+        from asm3.pbkdf2.pbkdf23 import pbkdf2
+
+        legacy_hash = pbkdf2(
+            hashlib.sha1, password.encode(), b"synthetic-salt", 100, 24
+        ).hex()
+        legacy = "pbkdf2:sha1:synthetic-salt:100:" + legacy_hash
+        self.assertTrue(
+            asm3.users.verify_password(
+                password, asm3.users.hash_password(password, "md5")
+            )
+        )
+        self.dbo.execute("UPDATE users SET Password = ? WHERE ID = 1", [legacy])
+        user = asm3.users.authenticate(self.dbo, "care-admin", password)
+        self.assertIsNotNone(user)
+        self.assertTrue(user["PASSWORD"].startswith("pbkdf2:sha256:"))
+        self.assertTrue(asm3.users.verify_password(password, user["PASSWORD"]))
+
+    def test_password_policy_on_creation_change_and_reset(self):
+        for password in ["short", "12345678901234567890", "password123456"]:
+            with self.assertRaises(asm3.utils.ASMValidationError):
+                asm3.users.insert_user_from_form(
+                    self.dbo,
+                    "test",
+                    asm3.utils.PostedData(
+                        {"username": "weak-user", "password": password}, "en_GB"
+                    ),
+                )
+            with self.assertRaises(asm3.utils.ASMValidationError):
+                asm3.users.reset_password(self.dbo, 1, password)
+            with self.assertRaises(asm3.utils.ASMValidationError):
+                asm3.users.change_password(self.dbo, "care-admin", "unused", password)
+        self.assertEqual(
+            self.dbo.query_int(
+                "SELECT COUNT(*) FROM users WHERE UserName = 'weak-user'"
+            ),
+            0,
+        )

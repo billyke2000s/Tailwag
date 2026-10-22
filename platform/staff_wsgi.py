@@ -5,9 +5,28 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "vendor/asm/src"))
 from shelter import core_runtime
+from shelter.accounts import credential_stamp
+import hmac
 from shelter.locks import writer_lock
 import main
 from whitenoise import WhiteNoise
+
+original_loggedin = main.ASMEndpoint.is_loggedin
+
+
+def credential_current(self, session):
+    if not original_loggedin(self, session):
+        return False
+    current = credential_stamp(session.dbo, session.user)
+    stored = session.get("credential_stamp", "")
+    if not current or not stored or not hmac.compare_digest(current, stored):
+        session.kill()
+        return False
+    return True
+
+
+main.ASMEndpoint.is_loggedin = credential_current
+
 
 main.web.config.debug = False
 main.app.internalerror = lambda: main.web.internalerror(
@@ -56,6 +75,7 @@ def application(environ, start_response):
     if path.rstrip("/") in (
         "/database",
         "/database_reset",
+        "/reset_password",
         "/database_update",
         "/service",
     ):
@@ -63,7 +83,9 @@ def application(environ, start_response):
             "403 Forbidden",
             "Web database installers and unconfigured external service APIs are disabled",
         )
-    if int(environ.get("CONTENT_LENGTH") or 0) > 16 * 1024 * 1024:
+    if int(environ.get("CONTENT_LENGTH") or 0) > (
+        16384 if path.rstrip("/") in ("/login", "/mobile_login") else 16 * 1024 * 1024
+    ):
         return reject("413 Content Too Large", "Upload is too large")
     if method not in ("GET", "HEAD", "OPTIONS"):
         parsed = urlsplit(environ.get("HTTP_ORIGIN") or environ.get("HTTP_REFERER", ""))

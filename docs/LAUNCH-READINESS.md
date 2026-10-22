@@ -11,6 +11,7 @@ No live service or production-ready claim is made. An appointed organisation own
 | Capacity/compatibility | Rooms/enclosures/foster household capacity, species and compatibility, concurrent/interrupt tests | Selected household checks only; no universal guarantee |
 | Access | Endpoint/object tests for every role, exports, search, media, reports, permissions | Role templates unassigned; foster-only logins gated |
 | Privacy | Controller notice, lawful bases, minimisation, retention schedule, legal holds, correction/export/deletion drill | Candidate notice; actual policy not approved |
+| Browser assets | Editor migration/save/print and remaining native widgets security review | Pinned replacements; editor verification in progress; full inventory not cleared |
 | Uploads | Installed scanner, malicious/oversized/polyglot/error tests on every route | Normal image/PDF wrapper implemented; alternate paths outstanding |
 | Operations | Host, DNS, TLS, secrets, monitoring, patch owner and support escalation | No host selected |
 | Jobs/email | Real test sender, failure/retry reconciliation, UK daylight-saving schedule and interrupted-job drill | Scripts prepared; provider unconfigured |

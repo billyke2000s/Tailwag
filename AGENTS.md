@@ -20,3 +20,5 @@ Platform: `.venv/bin/python platform/scripts/test.py`, `.venv/bin/python platfor
 Prototype changes: `npm run lint`, `npm test`, `npm run build`, `npm run test:e2e`; APK checks when Android tools are available. Preserve intentional sample content and offline generators. Never put provider secrets in browser code.
 
 Use accessible controls, visible keyboard focus, reduced motion and responsive layouts. GitHub README supports links, badges, tables, details and diagrams, not arbitrary executable widgets.
+
+Browser-library updates must change browser-assets.json integrity/source pins and the browser-dependencies advisory inventory together. Preserve corresponding source and licence notices. Re-run actual editor save/print and rich-text workflows when updating TinyMCE; a successful sign-in alone does not verify document editing. Never re-enable old vulnerable static script paths to make a screen load.
