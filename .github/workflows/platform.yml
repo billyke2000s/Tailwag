@@ -97,7 +97,7 @@ jobs:
   candidate-release:
     name: Publish operational evaluation candidate
     needs: platform
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/feature/shelter-platform' || github.ref == 'refs/heads/main')
+    if: false # Publication paused for bundled browser-library remediation
     runs-on: ubuntu-latest
     permissions:
       contents: write
