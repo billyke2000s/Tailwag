@@ -16,3 +16,12 @@ playwright-report/
 test-results/
 *.keystore
 *.jks
+
+.venv/
+platform/vendor/
+platform/runtime/
+platform/staticfiles/
+__pycache__/
+*.pyc
+
+.venv

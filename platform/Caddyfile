@@ -1,0 +1,20 @@
+{$PUBLIC_DOMAIN} {
+    encode zstd gzip
+    request_body {
+        max_size 64KB
+    }
+    reverse_proxy public:8000 {
+        header_up X-Real-IP {remote_host}
+    }
+}
+{$STAFF_DOMAIN} {
+    encode zstd gzip
+    request_body {
+        max_size 16MB
+    }
+    @blocked path /service /database /database_reset /database_update
+    respond @blocked 403
+    reverse_proxy staff:5000 {
+        header_up X-Real-IP {remote_host}
+    }
+}

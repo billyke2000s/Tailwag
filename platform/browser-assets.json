@@ -1,0 +1,41 @@
+{
+  "checked": "2026-10-22",
+  "assets": [
+    {
+      "name": "jquery",
+      "version": "3.7.1",
+      "url": "https://registry.npmjs.org/jquery/-/jquery-3.7.1.tgz",
+      "integrity": "sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==",
+      "format": "tar",
+      "prefix": "package/"
+    },
+    {
+      "name": "jquery-ui",
+      "version": "1.14.2",
+      "url": "https://jqueryui.com/resources/download/jquery-ui-1.14.2.zip",
+      "integrity": "sha512-PWYkrejEeNRJ5GEG8vb52g9nDlQSSiWeoi9G3LM9/E6kos1gAC/l4yX7+kNJbgTCZ+Xc4dY9d45i4kPToiDK9g==",
+      "format": "zip",
+      "prefix": "jquery-ui-1.14.2/"
+    },
+    {
+      "name": "moment",
+      "version": "2.31.0",
+      "url": "https://registry.npmjs.org/moment/-/moment-2.31.0.tgz",
+      "integrity": "sha512-0acOTfMiWOheYS4eoWb80yYMb/JLvVv9SHbs2PehaDzfUG0Bw855SKyk0IKTnPGa5+U2bmi3W68l1+sGLX/pvw==",
+      "format": "tar",
+      "prefix": "package/"
+    },
+    {
+      "name": "tinymce",
+      "version": "8.10.0",
+      "url": "https://registry.npmjs.org/tinymce/-/tinymce-8.10.0.tgz",
+      "integrity": "sha512-/e+/B+VdbzO02hLzfr3EaoYKYdr3phC/yitG7I9vpi2NqYvtb04UxO/Ay4y9VPqDaQHyigdFnHv2zuTgF7mnZQ==",
+      "format": "tar",
+      "prefix": "package/",
+      "source": {
+        "repository": "https://github.com/tinymce/tinymce.git",
+        "commit": "38ca1054e63ee89e2887a4e38d03e22ed480eb48"
+      }
+    }
+  ]
+}

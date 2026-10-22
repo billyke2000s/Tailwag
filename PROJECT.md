@@ -1,9 +1,19 @@
-# Project goals
+# Project scope
 
-Maintain and repair the existing TailWag dog/cat playdate prototype while preserving its design, sample profiles, test photos and simulated interactions.
+TailWag Animal Care adapts a friend's TailWag prototype into a maintainable animal welfare platform. Original idea and files belong to their original creators. The operational foundation is Animal Shelter Manager; see CREDITS.md and THIRD-PARTY.md.
 
-Current goals are dependable production asset loading, local state continuity, coherent discovery/filter/rewind behaviour, working scheduling shortcuts, accurate data-driven status labels and a reproducible Android debug APK containing the web app.
+## Confirmed context
 
-The original repository description mentions fostering/adoption, while the implemented prototype focuses on playdates. This repair preserves the implemented product. An adoption/fostering conversion requires separate requirements and is not part of these fixes.
+England; dogs and cats; rescue, rehoming, fostering and permanent sanctuary care; no hosting selected. Council, legal entity, actual premises, licensed activities, capacity, staffing, budget and domain remain unconfirmed. These are configuration and launch decisions, not inferred facts.
 
-There is no live backend, real verification, multi-user chat, animal placement process or external calendar integration. These are not required to test the present prototype.
+## Outcomes
+
+One accurate animal record links identity, ownership, care, placements, applications, documents, tasks and meaningful history. Public listings expose approved information only. Staff work through established native operational workflows with conservative access. A responsive public site sends enquiries to the real team inbox. Server preparation includes persistence, migrations, jobs, health, backup and recovery.
+
+## Boundaries
+
+No diagnosis or automatic prescribing; no automatic adoption decision; no automatic publication of care notes; no card storage. A web enquiry is not an approved application or placement. Software supports professional and organisational responsibilities, not an inspection or legal determination. Payments, external publishing and email require provider configuration and verification. Do not add unrelated social-network features to daily shelter operations.
+
+## Delivery state
+
+The operational implementation is an evaluation candidate. The independent v1.2.1 Android/PWA release remains a demonstration. Full launch scope and gaps are tracked in STATUS.md and docs/LAUNCH-READINESS.md; an inherited feature is not automatically verified for this organisation.

@@ -12,3 +12,14 @@ updates:
     directory: /
     schedule:
       interval: monthly
+
+  - package-ecosystem: pip
+    directory: /platform
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: /platform/browser-dependencies
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
