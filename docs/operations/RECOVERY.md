@@ -10,3 +10,5 @@
 For lost administrator TOTP, use scripts/recover-admin.py only from a trusted administrative environment with RECOVER_USERNAME and a new strong NEW_PASSWORD provided privately through the environment. It resets that account's TOTP and records the recovery; enrol again immediately. Never publish the password or secret in a command transcript, issue or screenshot.
 
 Backups need encryption, off-host copies, protected keys, monitoring and periodic restoration. The supplied dump helper alone does not provide those controls or an uptime guarantee.
+
+The public/native email reset endpoints are deliberately disabled. An authorised administrator must verify the requester’s identity under the organisation’s procedure before recovery. Password replacement invalidates the account’s existing sessions on their next protected request. Supply the replacement passphrase through an approved private channel, require TOTP re-enrolment and review the recovery audit. Never use a public issue or email containing a plaintext password as the recovery record.

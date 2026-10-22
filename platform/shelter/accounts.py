@@ -79,11 +79,24 @@ asm3.users.authenticate = authenticate
 
 def credential_stamp(dbo, username):
     import hashlib
+    import json
 
-    value = dbo.query_string(
-        "SELECT Password FROM users WHERE UserName = ?", [username]
+    users = dbo.query(
+        "SELECT ID, Password, SuperUser, DisableLogin, OwnerID, SiteID, LocationFilter, IPRestriction "
+        "FROM users WHERE UserName = ?", [username]
     )
-    return hashlib.sha256(value.encode()).hexdigest() if value else ""
+    if not users or users[0].DISABLELOGIN:
+        return ""
+    user = users[0]
+    roles = dbo.query(
+        "SELECT role.ID, role.SecurityMap FROM role "
+        "INNER JOIN userrole ON role.ID = userrole.RoleID "
+        "WHERE userrole.UserID = ? ORDER BY role.ID", [user.ID]
+    )
+    # Native permissions and location filters are cached in the session. Force a
+    # fresh login whenever their canonical values change, including role edits.
+    value = json.dumps([dict(user), [dict(role) for role in roles]], sort_keys=True)
+    return hashlib.sha256(value.encode()).hexdigest()
 
 
 original_login = asm3.users.web_login

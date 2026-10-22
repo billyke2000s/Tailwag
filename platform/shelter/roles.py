@@ -58,3 +58,26 @@ ROLES = {
 
 def security_map(flags):
     return "".join(flag + " *" for flag in flags)
+
+
+def restrict_default_reports(dbo):
+    """Do not expose foster/medical reports to a generic finance/report role."""
+    report_id = dbo.query_int(
+        "SELECT ID FROM customreport WHERE Title = 'Active Fosters'"
+    )
+    placement_role = dbo.query_int(
+        "SELECT ID FROM role WHERE RoleName = 'Placement team'"
+    )
+    if (
+        report_id
+        and placement_role
+        and not dbo.query_int(
+            "SELECT COUNT(*) FROM customreportrole WHERE ReportID = ?", [report_id]
+        )
+    ):
+        dbo.insert(
+            "customreportrole",
+            {"ReportID": report_id, "RoleID": placement_role, "CanView": 1},
+            generateID=False,
+            setCreated=False,
+        )

@@ -204,3 +204,8 @@ replace(
     return str(asm3.pbkdf2.pbkdf23.pbkdf2(hashfunc, str2bytes(plaintext), str2bytes(salt), iterations, 24).hex())""",
     """    return hashlib.pbkdf2_hmac(algorithm, str2bytes(plaintext), str2bytes(salt), iterations, dklen=24).hex()""",
 )
+replace(
+    "src/main.py",
+    '''        asm3.al.debug("%s changed settings: theme=%s, locale=%s, realname=%s, email=%s, quicklinks=%s, twofacode=%s, twofapass=%s" % (o.user, theme, locale, realname, email, quicklinks, twofavalidcode, twofavalidpassword), "main.change_password", o.dbo)''',
+    '''        asm3.al.debug("Account settings changed", "main.change_user_settings", o.dbo)''',
+)

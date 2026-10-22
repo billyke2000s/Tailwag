@@ -41,7 +41,7 @@ The platform connects an animal's identity, care, people, placements and history
 <details>
 <summary><strong>Explore the screens and verification</strong></summary>
 
-[Phone](docs/assets/platform/public-phone.png) · [Tablet](docs/assets/platform/public-tablet.png) · [Private desktop](docs/assets/platform/staff-desktop.png) · [Private phone](docs/assets/platform/staff-phone.png)
+[Phone](docs/assets/platform/public-phone.png) · [Tablet](docs/assets/platform/public-tablet.png) · [Private desktop](docs/assets/platform/staff-desktop.png) · [Private phone](docs/assets/platform/staff-phone.png) · [Document editor](docs/assets/platform/document-editor.png)
 
 The browser script checks representative routes, an actual incoming enquiry, keyboard skip navigation, staff sign-in/TOTP and three screen sizes. Read the dated [verification record](docs/VERIFICATION.md) for exact results and limitations; a screenshot is not proof that every workflow is ready.
 

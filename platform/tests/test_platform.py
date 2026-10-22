@@ -474,3 +474,48 @@ class PlatformTests(TestCase):
             ),
             0,
         )
+
+    def test_session_stamp_tracks_privileges_and_disabled_accounts(self):
+        from shelter.accounts import credential_stamp
+
+        original = credential_stamp(self.dbo, "care-admin")
+        self.assertTrue(original)
+        role = self.dbo.query_int("SELECT ID FROM role WHERE RoleName = 'Finance'")
+        self.dbo.insert("userrole", {"UserID": 1, "RoleID": role}, generateID=False)
+        assigned = credential_stamp(self.dbo, "care-admin")
+        self.assertNotEqual(original, assigned)
+        self.dbo.execute("UPDATE role SET SecurityMap = ? WHERE ID = ?", ["", role])
+        self.assertNotEqual(assigned, credential_stamp(self.dbo, "care-admin"))
+        self.dbo.execute("UPDATE users SET LocationFilter = '1' WHERE ID = 1")
+        filtered = credential_stamp(self.dbo, "care-admin")
+        self.assertNotEqual(assigned, filtered)
+        self.dbo.execute("UPDATE users SET DisableLogin = 1 WHERE ID = 1")
+        self.assertEqual(credential_stamp(self.dbo, "care-admin"), "")
+        self.assertEqual(credential_stamp(self.dbo, "nonexistent"), "")
+
+    def test_finance_role_cannot_view_sensitive_foster_report(self):
+        from types import SimpleNamespace
+        import asm3.reports
+
+        role = self.dbo.query_int("SELECT ID FROM role WHERE RoleName = 'Finance'")
+        asm3.users.insert_user_from_form(
+            self.dbo,
+            "test",
+            asm3.utils.PostedData(
+                {
+                    "username": "synthetic-finance",
+                    "password": "A unique synthetic finance passphrase!",
+                    "roles": str(role),
+                },
+                "en_GB",
+            ),
+        )
+        report = self.dbo.query_int(
+            "SELECT ID FROM customreport WHERE Title = 'Active Fosters'"
+        )
+        self.assertGreater(report, 0)
+        session = SimpleNamespace(
+            locale="en_GB", dbo=self.dbo, superuser=0, user="synthetic-finance"
+        )
+        with self.assertRaises(asm3.utils.ASMPermissionError):
+            asm3.reports.check_view_permission(session, report)

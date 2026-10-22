@@ -28,6 +28,7 @@ function run(args) {
   const r = spawnSync(python, args, { cwd: root, env, encoding: "utf8" });
   if (r.status !== 0)
     throw Error(`Setup failed: ${args.join(" ")}\n${r.stderr}`);
+  return r.stdout.trim();
 }
 async function ready(url) {
   for (let i = 0; i < 100; i++) {
@@ -73,6 +74,13 @@ try {
     "-c",
     "from shelter.core import database; import asm3.utils; d=database(); d.insert('templatedocument',{'ID':900000,'Name':'synthetic-browser.html','Path':'/','ShowAt':'everywhere','Content':asm3.utils.base64encode('<p>Synthetic agreement fixture</p>')},generateID=False)",
   ]);
+  const activeReportID = Number(
+    run([
+      "-c",
+      "from shelter.core import database; print(database().query_int(\"SELECT ID FROM customreport WHERE Title = 'Active Fosters'\"))",
+    ]),
+  );
+  if (!activeReportID) throw Error("Sensitive report fixture missing");
   for (const [port, app] of [
     [8000, "shelter.wsgi:application"],
     [5000, "staff_wsgi:application"],
@@ -293,7 +301,14 @@ try {
   await page
     .getByText("Password successfully changed.", { exact: true })
     .waitFor();
-  const revoked=await page.request.get('http://localhost:5000/main',{maxRedirects:0});if(revoked.status()!==303||!revoked.headers()['location']?.includes('/login'))throw Error('Changed password did not revoke the old session');
+  const revoked = await page.request.get("http://localhost:5000/main", {
+    maxRedirects: 0,
+  });
+  if (
+    revoked.status() !== 303 ||
+    !revoked.headers()["location"]?.includes("/login")
+  )
+    throw Error("Changed password did not revoke the old session");
   const recoveryGet = await page.request.get(
     "http://localhost:5000/reset_password?token=synthetic",
   );
@@ -349,12 +364,31 @@ try {
         );
       roleBoundaries++;
     }
+    if (role === "finance") {
+      const report = await context.request.get(
+        "http://localhost:5000/report?id=" + activeReportID,
+      );
+      if (report.status() !== 403)
+        throw Error("Finance can view foster health report");
+      roleBoundaries++;
+    }
     const denied = await context.request.post("http://localhost:5000/sql", {
       headers: { Origin: "http://localhost:5000" },
       form: { mode: "exec", sql: "SELECT 1" },
     });
     if (denied.status() !== 403) throw Error("SQL write boundary: " + role);
     roleBoundaries++;
+    if (role === "volunteer") {
+      run([
+        "-c",
+        "from shelter.core import database; d=database(); d.execute(\"UPDATE role SET SecurityMap = '' WHERE RoleName = 'Volunteer'\")",
+      ]);
+      const revokedRole = await context.request.get("http://localhost:5000/main", {
+        maxRedirects: 0,
+      });
+      if (revokedRole.status() !== 303 || !revokedRole.headers()["location"]?.includes("/login"))
+        throw Error("Changed role did not revoke cached permissions");
+    }
     await context.close();
   }
   const forbidden = await page.request.post("http://localhost:5000/login", {
@@ -373,6 +407,7 @@ try {
       documentSave: "passed",
       passwordChange: "passed",
       credentialSessionRevocation: "passed",
+      privilegeSessionRevocation: "passed",
       legacyEmailRecovery: "blocked",
       editorSanitization: "passed",
       browserAssetVersions: versions,

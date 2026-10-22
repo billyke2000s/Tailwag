@@ -76,6 +76,9 @@ for name, flags in ROLES.items():
             {"rolename": name, "securitymap": security_map(flags)}, dbo.locale
         ),
     )
+from shelter.roles import restrict_default_reports
+
+restrict_default_reports(dbo)
 for name in FORM_NAMES.values():
     fields = [
         {

@@ -8,7 +8,8 @@ This release adds a separate animal-care platform while preserving the original 
 - Responsive Django public website and four real enquiry types feeding the native inbox.
 - Explicit public-field/photo approval, fresh availability checks, bounded forms and repeat-submission protection.
 - Household assessment/foster-capacity checks and explicit return safeguards on selected placement paths.
-- Forced TOTP, zero-prefixed code fix, conservative role templates and native permission-denial status fix.
+- Forced TOTP, zero-prefixed code fix, stronger canonical password hashing and policy, legacy-hash upgrade, session revocation, administrator-assisted recovery, conservative role templates and native permission-denial status fix.
+- Pinned supported editor/browser library replacements, retained corresponding source and blocked vulnerable legacy script paths.
 - Reviewed daily tasks without automatic deletion, anonymisation, hold expiry or publishing.
 - PostgreSQL/container/proxy configuration, migrations, health, backup/restore and recovery helpers.
 - Research, reuse comparison, feature inventory, staff/admin guides and candid launch gates.

@@ -9,7 +9,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: tailwag-platform-${{ github.event.pull_request.head.ref || github.ref_name }}
+  group: tailwag-platform-${{ github.event_name }}-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
 jobs:
   platform:
@@ -88,7 +88,7 @@ jobs:
         if: github.event_name == 'push'
         run: |
           mkdir release-care
-          tar --exclude='platform/runtime' --exclude='platform/staticfiles' --exclude='__pycache__' --exclude='*.pyc' --exclude='platform/vendor/asm/scripts/schema/schema.db' --exclude='.env' -czf release-care/TailWag-Care-0.1.0-alpha.1-source.tar.gz platform README.md PROJECT.md SPECIFICATION.md ARCHITECTURE.md DEVELOPMENT.md TESTING.md DEPLOYMENT.md SECURITY.md STATUS.md DECISIONS.md THIRD-PARTY.md CREDITS.md docs/RESEARCH.md docs/REUSE.md docs/FEATURE-INVENTORY.md docs/LAUNCH-READINESS.md docs/VERIFICATION.md docs/operations
+          tar --exclude='platform/runtime' --exclude='platform/staticfiles' --exclude='__pycache__' --exclude='*.pyc' --exclude='platform/vendor/asm/scripts/schema/schema.db' --exclude='.env' --exclude='.git' -czf release-care/TailWag-Care-0.1.0-alpha.1-source.tar.gz platform *.md docs .github/workflows/platform.yml
           cd release-care
           sha256sum *.tar.gz > SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
@@ -99,7 +99,7 @@ jobs:
   candidate-release:
     name: Publish operational evaluation candidate
     needs: platform
-    if: false # Publication paused for bundled browser-library remediation
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/shelter-platform'
     runs-on: ubuntu-latest
     permissions:
       contents: write

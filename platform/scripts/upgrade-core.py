@@ -45,4 +45,7 @@ for name in FORM_NAMES.values():
                 core.locale,
             ),
         )
+from shelter.roles import restrict_default_reports
+
+restrict_default_reports(core)
 print("Core schema and adapter form metadata current")

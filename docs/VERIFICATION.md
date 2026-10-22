@@ -4,9 +4,9 @@ Restored source revision checked on 22 October 2026. The workspace reset destroy
 
 | Check | Actual result |
 |---|---|
-| Platform integration suite | 26 passed, 8.228 seconds; isolated SQLite/native database |
-| Selected ASM domain suite | 391 passed, 259.742 seconds; reset per test; outbound email stubbed |
-| Browser checks | Passed: 12 public route/viewport checks, real enquiry, keyboard skip, persisted TOTP enrolment, staff dashboard at 3 sizes, 40 route/write boundaries across care, veterinary, placement, volunteer and finance roles, foreign Origin rejection; reviewed daily jobs smoke passed |
+| Platform integration suite | 30 passed, 8.933 seconds; isolated SQLite/native database |
+| Selected ASM domain suite | 391 passed, 254.533 seconds; reset per test; outbound email stubbed |
+| Browser checks | Passed: 12 public route/viewport checks, real enquiry, keyboard skip, persisted TOTP enrolment, staff dashboard at 3 sizes, 41 selected route/write boundaries across care, veterinary, placement, volunteer and finance roles, foreign Origin rejection; real document save/reload, basic editor sanitisation, password-change session revocation and blocked legacy recovery; reviewed daily jobs smoke passed |
 | Dependency advisory scan | No known vulnerabilities found for the locked Python packages |
 | PostgreSQL fresh install/sequence/dump/restore | Passed in [CI run 39767927798](https://github.com/billyke2000s/Tailwag/actions/runs/39767927798) |
 | Docker/Compose/Caddy | Image build, configuration expansion and syntax passed in the same CI run |
@@ -22,4 +22,8 @@ Public receipt references are now retained in the native incoming form fields as
 
 ## Browser-library remediation
 
-A separate review identified the loaded TinyMCE 5.5.1 XSS advisory. Publication was paused. Replacements are pinned in browser-assets.json and corresponding editor source is retained. Sign-in/dashboard/40 selected role boundaries passed with the replacements. Document save/reload and sanitisation checks were added and remain under verification. The four-package advisory inventory reports zero known vulnerabilities; this is not a clearance of every inherited widget or its historical build tooling. See BROWSER-LIBRARIES.md.
+A separate review identified the loaded TinyMCE 5.5.1 XSS advisory. Publication was paused. Replacements are pinned in browser-assets.json and corresponding editor source is retained. Sign-in/dashboard/40 selected role boundaries passed with the replacements. Document save/reload and basic sanitisation checks passed with TinyMCE 8.10.0. The four-package advisory inventory reports zero known vulnerabilities; this is not a clearance of every inherited widget or its historical build tooling. See BROWSER-LIBRARIES.md.
+
+## Account and report hardening
+
+Thirty integration checks passed after adding password policy, legacy-hash upgrade, sensitive foster-report ACL and canonical privilege-stamp tests. The selected 391 native checks passed in 254.533 seconds after password hashing changes. The browser rerun confirmed password-change revocation and legacy recovery rejection. The subsequent browser rerun passed actual role-change session revocation as well. Canonical role assignments/maps and account access restrictions are included in the session stamp. No email delivery, private identity recovery or complete permission-matrix claim follows from these checks.
