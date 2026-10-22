@@ -1,0 +1,54 @@
+name: tailwag-care
+x-application: &application
+  build: .
+  image: tailwag-care:local
+  env_file: .env
+  restart: unless-stopped
+  volumes: [runtime:/app/runtime]
+  depends_on:
+    db:
+      condition: service_healthy
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+services:
+  db:
+    image: postgres:16-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PGDATABASE:?Set PGDATABASE}
+      POSTGRES_USER: ${PGUSER:?Set PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD:?Set PGPASSWORD}
+    volumes: [database:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  public:
+    <<: *application
+    command: [sh, scripts/entrypoint.sh, public]
+    healthcheck:
+      test: [CMD, python, scripts/healthcheck.py]
+      interval: 30s
+      timeout: 8s
+      retries: 3
+  staff:
+    <<: *application
+    command: [sh, scripts/entrypoint.sh, staff]
+  jobs:
+    <<: *application
+    command: [sh, scripts/entrypoint.sh, jobs]
+  proxy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ['80:80','443:443']
+    environment:
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:?Set PUBLIC_DOMAIN}
+      STAFF_DOMAIN: ${STAFF_DOMAIN:?Set STAFF_DOMAIN}
+    volumes: ['./Caddyfile:/etc/caddy/Caddyfile:ro','caddy-data:/data','caddy-config:/config']
+    depends_on: [public, staff]
+volumes:
+  database:
+  runtime:
+  caddy-data:
+  caddy-config:

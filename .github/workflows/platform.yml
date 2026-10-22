@@ -1,0 +1,76 @@
+name: Shelter platform checks
+on:
+  push:
+    branches: [main, 'feature/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  platform:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: care_test
+          POSTGRES_PASSWORD: synthetic-ci-only
+          POSTGRES_DB: care_test
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U care_test -d care_test" --health-interval 10s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: platform/requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -r platform/requirements.txt
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Audit locked Python packages
+        run: |
+          .venv/bin/pip install pip-audit==2.10.1
+          .venv/bin/pip-audit -r platform/requirements.txt --no-deps
+      - name: Fetch pinned core and compile
+        run: |
+          .venv/bin/python platform/scripts/fetch-core.py
+          .venv/bin/python -m compileall -q platform/shelter platform/scripts
+      - name: Connected workflow tests
+        run: .venv/bin/python platform/scripts/test.py
+      - name: Adopted domain tests
+        run: .venv/bin/python platform/scripts/test-core.py
+      - name: PostgreSQL install, migration and restore
+        env:
+          PGHOST: localhost
+          PGPORT: '5432'
+          PGDATABASE: care_test
+          PGUSER: care_test
+          PGPASSWORD: synthetic-ci-only
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client-16
+          .venv/bin/python platform/scripts/test-postgres.py
+      - name: Browser workflows and responsive screens
+        run: node platform/scripts/browser-test.mjs
+      - name: Build deployment image
+        run: docker build -t tailwag-care:ci platform
+      - name: Validate server configuration
+        working-directory: platform
+        run: |
+          cp .env.example .env
+          PGDATABASE=synthetic_test PGUSER=synthetic_test PGPASSWORD=synthetic-ci-only PUBLIC_DOMAIN=care.example.invalid STAFF_DOMAIN=team.example.invalid docker compose config --quiet
+          docker run --rm -e PUBLIC_DOMAIN=care.example.invalid -e STAFF_DOMAIN=team.example.invalid -v "$PWD/Caddyfile:/etc/caddy/Caddyfile:ro" caddy:2 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: synthetic-platform-screens
+          path: docs/assets/platform/

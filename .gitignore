@@ -23,3 +23,5 @@ platform/runtime/
 platform/staticfiles/
 __pycache__/
 *.pyc
+
+.venv
