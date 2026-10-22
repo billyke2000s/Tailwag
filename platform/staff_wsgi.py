@@ -36,6 +36,11 @@ def application(environ, start_response):
     if os.getenv("TRUST_PROXY") == "true" and environ.get("HTTP_X_REAL_IP"):
         environ["REMOTE_ADDR"] = environ["HTTP_X_REAL_IP"]
     path = environ.get("PATH_INFO", "/")
+    if path.endswith(".js") and any(
+        path.startswith("/static/lib/" + name + "/")
+        for name in ("jquery", "jqueryui", "moment", "tinymce")
+    ):
+        return _blocked_legacy_asset(start_response)
     method = environ.get("REQUEST_METHOD", "GET")
 
     def reject(status, message):
@@ -106,3 +111,10 @@ def application(environ, start_response):
         with writer_lock():
             return list(app(environ, headers))
     return app(environ, headers)
+
+
+def _blocked_legacy_asset(start_response):
+    start_response(
+        "404 Not Found", [("Content-Type", "text/plain"), ("Cache-Control", "no-store")]
+    )
+    return [b"Legacy browser asset is not served"]

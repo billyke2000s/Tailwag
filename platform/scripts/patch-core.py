@@ -93,3 +93,71 @@ replace(
     'Custom error thrown by data modules when permission checks fail\n    """\n    msg = ""\n    def __init__(self, msg: str) -> None:\n        self.msg = msg\n        status = \'500 Internal Server Error\'',
     'Custom error thrown by data modules when permission checks fail\n    """\n    msg = ""\n    def __init__(self, msg: str) -> None:\n        self.msg = msg\n        status = \'403 Forbidden\'',
 )
+
+# Reviewed browser libraries; fetch-browser-assets.py verifies the distribution hashes.
+replace(
+    "src/asm3/sitedefs.py",
+    "static/lib/jquery/3.7.0/jquery.min.js",
+    "static/lib/tailwag-supported/jquery/dist/jquery.min.js",
+)
+replace(
+    "src/asm3/sitedefs.py",
+    "static/lib/jqueryui/jquery-ui-1.13.2/jquery-ui.min.js",
+    "static/lib/tailwag-supported/jquery-ui/jquery-ui.min.js",
+)
+replace(
+    "src/asm3/sitedefs.py",
+    "static/lib/moment/2.29.1/moment.min.js",
+    "static/lib/tailwag-supported/moment/min/moment.min.js",
+)
+replace(
+    "src/asm3/sitedefs.py",
+    "static/lib/tinymce/5.5.1/tinymce/js/tinymce/tinymce.min.js",
+    "static/lib/tailwag-supported/tinymce/tinymce.min.js",
+)
+for file in ["src/static/js/common_widgets.js", "src/static/js/document_edit.js"]:
+    replace(
+        file,
+        "tinymce.init({",
+        'tinymce.init({\n            license_key: "gpl",\n            promotion: false,',
+    )
+    replace(file, "fontselect fontsizeselect", "fontfamily fontsize")
+    replace(file, "fontsize_formats:", "font_size_formats:")
+replace("src/static/js/document_edit.js", "font_formats:", "font_family_formats:")
+replace(
+    "src/static/js/document_edit.js",
+    "toolbar1: readonly ? ro_toolbar : rw_toolbar,",
+    "toolbar: readonly ? ro_toolbar : rw_toolbar,",
+)
+replace(
+    "src/static/js/common_widgets.js",
+    '''                "advlist autolink lists link image charmap code ",
+                "hr anchor searchreplace visualblocks visualchars ",
+                "insertdatetime media nonbreaking table directionality",
+                "emoticons template paste"''',
+    '''                "advlist autolink lists link image charmap code",
+                "anchor searchreplace visualblocks visualchars",
+                "insertdatetime media nonbreaking table directionality emoticons"''',
+)
+replace(
+    "src/static/js/document_edit.js",
+    '''            "advlist directionality lists link image charmap print preview",
+            "hr anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen",
+            "insertdatetime media nonbreaking save table contextmenu directionality",
+            "emoticons paste textcolor save"''',
+    '''            "advlist directionality lists link image charmap preview",
+            "anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen",
+            "insertdatetime media nonbreaking save table emoticons"''',
+)
+replace(
+    "src/static/js/document_edit.js",
+    """        setup: function(ed) {
+
+            // Add a PDF button""",
+    """        setup: function(ed) {
+            // Print is no longer a separately distributed TinyMCE plugin.
+            ed.addCommand("mcePrint", function() { ed.getWin().focus(); ed.getWin().print(); });
+            ed.ui.registry.addButton("print", { icon: "print", tooltip: "Print", onAction: function() { ed.execCommand("mcePrint"); } });
+
+            // Add a PDF button""",
+)

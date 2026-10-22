@@ -69,6 +69,10 @@ try {
     "-c",
     "from shelter.core import database; import asm3.users,asm3.utils,os; d=database(); roles=['Care team','Veterinary team','Placement team','Volunteer','Finance']; [(lambda r: d.update('users',asm3.users.insert_user_from_form(d,'browser-test',asm3.utils.PostedData({'username':'synthetic-'+r.lower().split()[0],'realname':'Synthetic role test','password':os.environ['ADMIN_PASSWORD'],'roles':str(d.query_int('SELECT ID FROM role WHERE RoleName = ?',[r]))},'en_GB')),{'EnableTOTP':1,'OTPSecret':'JBSWY3DPEHPK3PXP'}))(r) for r in roles]",
   ]);
+  run([
+    "-c",
+    "from shelter.core import database; import asm3.utils; d=database(); d.insert('templatedocument',{'ID':900000,'Name':'synthetic-browser.html','Path':'/','ShowAt':'everywhere','Content':asm3.utils.base64encode('<p>Synthetic agreement fixture</p>')},generateID=False)",
+  ]);
   for (const [port, app] of [
     [8000, "shelter.wsgi:application"],
     [5000, "staff_wsgi:application"],
@@ -101,7 +105,8 @@ try {
       : {}),
     args: ["--no-sandbox"],
   });
-  const page = await browser.newPage();
+  const mainContext = await browser.newContext();
+  const page = await mainContext.newPage();
   mkdirSync("docs/assets/platform", { recursive: true });
   let checked = 0;
   for (const [label, width, height] of [
@@ -218,6 +223,68 @@ try {
         )}`,
       );
   }
+  const versions = await page.evaluate(() => ({
+    jquery: jQuery.fn.jquery,
+    jqueryUI: jQuery.ui.version,
+    moment: moment.version,
+    tinymce: tinymce.majorVersion + "." + tinymce.minorVersion,
+  }));
+  if (
+    versions.jquery !== "3.7.1" ||
+    versions.jqueryUI !== "1.14.2" ||
+    versions.moment !== "2.31.0" ||
+    versions.tinymce !== "8.10.0"
+  )
+    throw Error("Unexpected browser-library version");
+  const editor = await page.context().newPage();
+  await editor.goto("http://localhost:5000/document_template_edit?dtid=900000");
+  await editor.waitForFunction(
+    () => typeof tinymce !== "undefined" && tinymce.activeEditor?.initialized,
+  );
+  await editor.evaluate(() => {
+    window.__tailwagXSS = false;
+    tinymce.activeEditor.setContent(
+      '<p>Synthetic sanitisation check</p><img src="data:image/png;base64,bad" onerror="window.top.__tailwagXSS=true">',
+    );
+  });
+  if (
+    await editor.evaluate(
+      () =>
+        window.__tailwagXSS ||
+        tinymce.activeEditor.getContent().includes("onerror"),
+    )
+  )
+    throw Error("Editor sanitisation failed");
+  await editor
+    .frameLocator("iframe.tox-edit-area__iframe")
+    .locator("body")
+    .fill("Synthetic agreement saved through the real editor.");
+  await editor.waitForTimeout(1100);
+  await editor.screenshot({path:'docs/assets/platform/document-editor-debug.png',fullPage:true});console.log('editor_toolbar',await editor.getByRole('button').evaluateAll(nodes=>nodes.map(n=>({label:n.getAttribute('aria-label'),title:n.getAttribute('title'),text:n.textContent?.slice(0,45)}))));
+  await editor.getByRole("button", { name: /^Save/ }).click();
+  await editor.waitForURL(/document_templates/);
+  await editor.goto("http://localhost:5000/document_template_edit?dtid=900000");
+  await editor.waitForFunction(
+    () => typeof tinymce !== "undefined" && tinymce.activeEditor?.initialized,
+  );
+  if (
+    !(await editor.evaluate(() =>
+      tinymce.activeEditor
+        .getContent()
+        .includes("Synthetic agreement saved through the real editor."),
+    ))
+  )
+    throw Error("Editor save did not persist");
+  await editor.screenshot({
+    path: "docs/assets/platform/document-editor.png",
+    fullPage: true,
+  });
+  await editor.close();
+  const oldAsset = await page.request.get(
+    "http://localhost:5000/static/lib/tinymce/5.5.1/tinymce/js/tinymce/tinymce.min.js",
+  );
+  if (oldAsset.status() !== 404)
+    throw Error("Vulnerable legacy asset is still served");
   let roleBoundaries = 0;
   const matrix = {
     care: [200, 403, 200, 403, 403, 403, 403],
@@ -283,6 +350,9 @@ try {
       staffLoginAndTOTP: "passed",
       staffViewports: 3,
       roleBoundaries,
+      documentSave: "passed",
+      editorSanitization: "passed",
+      browserAssetVersions: versions,
       reviewedDailyJobs: "passed",
       foreignOrigin: "blocked",
     }),

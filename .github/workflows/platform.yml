@@ -45,6 +45,8 @@ jobs:
         run: |
           .venv/bin/pip install pip-audit==2.10.1
           .venv/bin/pip-audit -r platform/requirements.txt --no-deps
+      - name: Audit native browser library inventory
+        run: npm audit --prefix platform/browser-dependencies --omit=dev
       - name: Fetch pinned core and compile
         run: |
           .venv/bin/python platform/scripts/fetch-core.py

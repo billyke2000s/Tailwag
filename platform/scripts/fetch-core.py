@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, pathlib, subprocess, sys, tempfile, os
+import json, pathlib, subprocess, sys, tempfile, os, hashlib
 
 root = pathlib.Path(__file__).resolve().parents[1]
 lock = json.loads((root / "upstream.json").read_text())
@@ -26,8 +26,15 @@ if (
 ):
     raise SystemExit("Core revision mismatch")
 (root / "runtime").mkdir(exist_ok=True)
+adaptation = hashlib.sha256(
+    b"".join(
+        (root / name).read_bytes()
+        for name in ["scripts/patch-core.py", "static/staff.css", "browser-assets.json"]
+    )
+).hexdigest()[:12]
+build = lock["commit"][:12] + "-tw-" + adaptation
 (target / "src/asm3/__version__.py").write_text(
-    f"VERSION={lock['version']!r}\nBUILD={lock['commit'][:12]!r}\n"
+    f"VERSION={lock['version']!r}\nBUILD={build!r}\n"
 )
 subprocess.run(
     [sys.executable, str(root / "scripts/patch-core.py"), str(target)], check=True
@@ -53,3 +60,7 @@ with tempfile.NamedTemporaryFile(mode="w") as config:
             check=True,
             stdout=out,
         )
+
+subprocess.run(
+    [sys.executable, str(root / "scripts/fetch-browser-assets.py")], check=True
+)
