@@ -1,6 +1,6 @@
 # Delivery status
 
-Updated 22 October 2026. Operational work is on `feature/shelter-platform`; main and the v1.2.1 prototype/APK remain intact.
+Updated 22 October 2026. The care-v0.1.0-alpha.1 evaluation prerelease is published. The platform is integrated alongside the independent original React/PWA/Android prototype; v1.2.1 remains intact.
 
 | Capability | State | Evidence / next gate |
 |---|---|---|

@@ -34,4 +34,10 @@ Backup maintenance review fixed unconditional service restart and non-portable c
 
 A separate isolated synthetic care rehearsal passed linked one-off scheduling, administration, attributed correction, audit actors and preservation of one treatment record. This was a direct native adapter rehearsal, not a full browser/clinical approval or duplicate-stock/concurrency test.
 
-Final checkpoint `6f1e25f` is awaiting [CI run 39823603416](https://github.com/billyke2000s/Tailwag/actions/runs/39823603416). At handover its dependency-install step remained in progress; no final pass or new release publication is claimed. Candidate publication is conditional on the complete pipeline, including the fresh-extraction and backup-wrapper checks. The earlier completed run remains the evidence for the production-settings smoke described above.
+## Published evaluation checkpoint
+
+[CI run 39823603416](https://github.com/billyke2000s/Tailwag/actions/runs/39823603416) passed at source checkpoint `6f1e25fc84b7eb6090c78c518b0fbc898d6c47f5`: 30 integration tests (11.741 seconds), 391 selected native tests (208.385 seconds), backup-wrapper checks, both scoped dependency audits, PostgreSQL install/migration/dump-restore, browser workflows and 41 selected role boundaries, image build, production-settings startup, Compose/Caddy validation and fresh source archive extraction/setup. These results supersede the earlier pending-status note.
+
+The workflow published [care-v0.1.0-alpha.1](https://github.com/billyke2000s/Tailwag/releases/tag/care-v0.1.0-alpha.1) as a prerelease with the operational source archive and SHA256SUMS.txt. The release/tag remains pinned to its verified source revision. Subsequent documentation updates do not change that immutable checkpoint. This is an evaluation release, not an operational deployment or a completed launch approval.
+
+A separate local synthetic backup SIGTERM rehearsal also passed: previously running writers resumed and no completed dump was exposed. It does not replace an encrypted off-host restore drill.

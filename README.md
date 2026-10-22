@@ -8,12 +8,12 @@
 
 An operational platform in development for rescue, foster and sanctuary teams.
 
-[![Platform checks](https://github.com/billyke2000s/Tailwag/actions/workflows/platform.yml/badge.svg?branch=feature%2Fshelter-platform)](https://github.com/billyke2000s/Tailwag/actions/workflows/platform.yml)
+[![Platform checks](https://github.com/billyke2000s/Tailwag/actions/workflows/platform.yml/badge.svg?branch=main)](https://github.com/billyke2000s/Tailwag/actions/workflows/platform.yml)
 [![Status: evaluation candidate](https://img.shields.io/badge/status-evaluation_candidate-d5b979)](STATUS.md)
 [![Core: ASM 52u](https://img.shields.io/badge/core-ASM_52u-164e43)](platform/upstream.json)
 [![Platform: GPL v3](https://img.shields.io/badge/platform-GPL_v3-blue)](platform/LICENSE)
 
-[Quick start](#run-locally) · [Architecture](ARCHITECTURE.md) · [Staff guide](docs/operations/STAFF.md) · [Deployment](DEPLOYMENT.md) · [Verification](docs/VERIFICATION.md)
+[Evaluation release](https://github.com/billyke2000s/Tailwag/releases/tag/care-v0.1.0-alpha.1) · [Quick start](#run-locally) · [Architecture](ARCHITECTURE.md) · [Staff guide](docs/operations/STAFF.md) · [Deployment](DEPLOYMENT.md) · [Verification](docs/VERIFICATION.md)
 
 </div>
 
@@ -54,7 +54,6 @@ Python 3.12, Git and native dependencies are required; see [development setup](D
 ```sh
 git clone https://github.com/billyke2000s/Tailwag.git
 cd Tailwag
-git switch feature/shelter-platform
 python3 -m venv .venv
 .venv/bin/pip install -r platform/requirements.txt
 .venv/bin/python platform/scripts/fetch-core.py

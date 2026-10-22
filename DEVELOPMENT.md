@@ -5,7 +5,6 @@ Prerequisites: Git, Python 3.12, Node 22.12+, npm; Linux native libraries requir
 ```sh
 git clone https://github.com/billyke2000s/Tailwag.git
 cd Tailwag
-git switch feature/shelter-platform
 python3 -m venv .venv
 .venv/bin/pip install -r platform/requirements.txt
 .venv/bin/python platform/scripts/fetch-core.py

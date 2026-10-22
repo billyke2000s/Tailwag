@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — operational shelter candidate
+## care-v0.1.0-alpha.1 — 22 October 2026 · evaluation prerelease
 
 - Add an isolated, pinned ASM operational foundation and a responsive Django public site.
 - Connect four enquiry types to the native private inbox with receipts, duplicate protection and uncertain-write reconciliation.
