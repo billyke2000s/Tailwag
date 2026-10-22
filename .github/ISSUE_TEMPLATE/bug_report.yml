@@ -37,3 +37,19 @@ body:
     attributes:
       label: Error text or screenshots
       description: Remove private information before sharing.
+  - type: dropdown
+    id: application
+    attributes:
+      label: Application
+      options:
+        - Operational public website
+        - Operational staff workspace
+        - Original React/PWA/Android prototype
+        - Deployment or documentation
+    validations:
+      required: true
+  - type: input
+    id: role
+    attributes:
+      label: Role and workflow
+      description: Give the role name and affected workflow, without account identifiers or private data.

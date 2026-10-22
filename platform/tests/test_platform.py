@@ -93,3 +93,8 @@ class PlatformTests(TestCase):
         from shelter.roles import ROLES,security_map
         permissions=security_map(ROLES['Volunteer']);self.assertTrue(asm3.users.check_permission_map_bool(0,permissions,asm3.users.VIEW_ANIMAL))
         for perm in (asm3.users.VIEW_PERSON,asm3.users.ADD_MOVEMENT,asm3.users.ADD_USER,asm3.users.USE_SQL_INTERFACE,asm3.users.EXPORT_PEOPLE_CSV):self.assertFalse(asm3.users.check_permission_map_bool(0,permissions,perm))
+
+    def test_totp_leading_zero_enrolment(self):
+        with patch('asm3.utils.totp',return_value=12345):
+            asm3.users.update_user_settings(self.dbo,'care-admin',twofavalidcode='012345')
+        self.assertEqual(self.dbo.query_int("SELECT EnableTOTP FROM users WHERE UserName = 'care-admin'"),1)

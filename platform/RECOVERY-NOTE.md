@@ -1,5 +1,3 @@
-# Implementation checkpoint
+# Source continuity
 
-Operational platform reconstructed from the active development session after a workspace reset. Original prototype remains independent. Research scope confirmed: England, dogs/cats, mixed rescue/fostering/rehoming/sanctuary; council, actual capacity, organisation identity and hosting are not supplied.
-
-This checkpoint is not a release or a production-readiness claim. New source and restored verification must be checked together before handover. Full scope/acceptance and external requirements will be recorded in the repository documentation.
+Operational changes are checkpointed on feature/shelter-platform. Working status is maintained in ../STATUS.md and verification evidence in ../docs/VERIFICATION.md. Runtime secrets, source checkouts and synthetic databases remain ignored and reproducible from the pinned configuration.

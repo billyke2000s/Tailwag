@@ -1,19 +1,23 @@
 # Development
 
-Use Node 22.12+ and npm. `npm ci` reproduces `package-lock.json`; do not work around dependency conflicts with force or legacy-peer-deps.
+Prerequisites: Git, Python 3.12, Node 22.12+, npm; Linux native libraries required by Pillow/WeasyPrint. PostgreSQL 16 and Docker Compose v2 are needed for server checks. No operational credentials or records belong in a development checkout.
 
-- `npm run dev`: Vite on port 3000.
-- `npm run lint`: TypeScript checking.
-- `npm test`: Node regression tests.
-- `npm run build`: production web bundle, Android asset copy, canonical Android ZIP.
-- `npm run preview`: serve `dist` for production checks.
-- `npm run test:e2e`: Playwright interaction tests; install Chromium first with `npx playwright install chromium`.
-- `npm run build:apk`: web build and Gradle debug APK.
+```sh
+git clone https://github.com/billyke2000s/Tailwag.git
+cd Tailwag
+git switch feature/shelter-platform
+python3 -m venv .venv
+.venv/bin/pip install -r platform/requirements.txt
+.venv/bin/python platform/scripts/fetch-core.py
+.venv/bin/python platform/scripts/dev.py --prepare
+.venv/bin/python platform/scripts/dev.py --seed
+.venv/bin/python platform/scripts/dev.py
+```
 
-Android uses Java 17, Gradle 8.2, Android Gradle Plugin 8.2.2 and SDK 34. Configure the SDK with ANDROID_HOME or ignored android/local.properties. The Gradle wrapper is committed, including Windows scripts. Initial builds need network access to download Gradle and Maven dependencies.
+Public: http://127.0.0.1:8000. Staff: http://localhost:5000. Use the exact staff hostname because Origin checks use STAFF_URL. `--seed` is optional, refuses a populated animal database, and creates explicitly synthetic dog/cat residents. It does not import original prototype photographs.
 
-The canonical Android source lives in android/. Do not maintain a second Java/manifest template inside the frontend. scripts/prepare-android.mjs copies dist into ignored app assets; scripts/package-android.mjs packages that same project with those assets. Do not commit generated APKs, signing keys, SDK paths or build directories.
+Initial user: `care-admin`. The generated password is in ignored `platform/runtime/dev-secrets.json`; view it locally and keep it private. Enrol an authenticator on first login. The runtime configuration, databases and secrets are ignored. Never run `bootstrap.py` on an existing core; it refuses an existing users table. Source fetch and bootstrap need internet only for source/dependencies, not remote executable report installation.
 
-The exported dist/TailWag-Android-Project.zip includes web assets and builds directly with ./gradlew assembleDebug (Windows: gradlew.bat assembleDebug). Its Linux wrapper has executable ZIP permissions; chmod +x gradlew if an extractor strips them.
+Run verification in TESTING.md before opening a PR. Keep dependencies pinned and review advisories before updating. Add a migration for Django metadata changes; native schema upgrades use `upgrade-core.py`. Do not mutate copied vendor files without adding a repeatable patch. Production settings are described in DEPLOYMENT.md.
 
-.env.example contains optional public hosting/download URLs. Wingman is an offline generator and must never accept a provider secret through a VITE_ variable.
+The root React/PWA/Android prototype keeps its own `npm ci`, `npm run dev` and build commands. It is not the shelter's canonical backend and must not be connected to live care records casually.

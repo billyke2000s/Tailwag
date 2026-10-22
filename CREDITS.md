@@ -17,3 +17,7 @@ The original idea, app files, visual direction, dog and cat fixtures, test image
 Existing copyright and SPDX notices are preserved. Package dependencies retain their respective licences. Test photos and externally referenced images originate from the upstream project; this repository makes no independent ownership claim over them.
 
 At the tracked upstream revision there was no repository-wide LICENSE file. This repair does not assign a new blanket licence to upstream files or imply that attribution alone grants rights beyond the original terms. Any future licence must reflect the original author's permissions and third-party material.
+
+## Operational platform expansion
+
+The separate platform/ adapts Animal Shelter Manager 52u, by its upstream contributors, as the canonical welfare backend. New public pages, extension safeguards, setup/testing/deployment scripts and operational documentation are adaptations prepared for this repository. They do not claim authorship of upstream ASM. Exact source, modifications and licence boundaries are documented in platform/upstream.json and THIRD-PARTY.md.

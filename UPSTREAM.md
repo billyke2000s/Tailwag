@@ -22,3 +22,9 @@ The repair baseline was implemented in commit 18428e9 locally, based on that rev
 5. Update this file with the actual incorporated revision and record the change in CHANGELOG.md.
 
 Do not replace the project wholesale or silently overwrite repairs with an upstream snapshot. Do not claim future upstream commits have been included before checking them.
+
+## Operational-core tracking
+
+ASM source: https://github.com/sheltermanager/asm3. Exact revision: 90abdf5f29cba46f0290ce689bf751fd1468de31 (52u). The machine-readable lock is platform/upstream.json; local changes apply through checked patches and extension wrappers.
+
+On 22 October 2026, the original TailWag URL could not be fetched during the platform research. The earlier comparison above is historical evidence only; no claim is made that subsequent original-creator changes are absent or incorporated.

@@ -1,36 +1,22 @@
-# AI Agent Guidelines & Rules (AGENTS.md)
+# Contributor and coding-agent instructions
 
-This document establishes the operational rules and standards for AI coding agents modifying the **TailWag** codebase.
+Read PROJECT.md, SPECIFICATION.md, ARCHITECTURE.md and STATUS.md before changing behaviour. This branch adds real shelter operations under `platform/`; the original React/Android prototype remains independently supported at the repository root. The user explicitly authorised this expansion; older prototype-only rules do not constrain the platform.
 
-## 1. Core Principles
+- Preserve upstream authorship, copyright, data and working prototype features. Never claim this adaptation invented TailWag or ASM.
+- Animal Shelter Manager is the canonical animal, person, medical, movement and staff store. Do not create competing operational records in Django.
+- Fetch exactly `platform/upstream.json`. Apply source patches through checked, repeatable anchors. Review schema and internal API changes before updating the pin.
+- No secrets, private records, real care histories or identifiable people in fixtures, screenshots or commits. Demonstrations must be clearly synthetic.
+- Public responses use an explicit field allowlist and current publication eligibility. Internal notes, foster addresses and documents remain private. Never fall back to private comments.
+- Check permissions on the server. Role templates are starting points, not evidence that every native route is isolated. Foster-only accounts remain disabled until object-level access is verified.
+- No invented veterinary prescriptions or doses. Never silently end placements, override sanctuary status, retry uncertain writes or erase history to make a test pass.
+- Do not present unconfigured email, payments, scanners or third-party publishing as operational. All visible controls need a real workflow or an explicit unavailable state.
+- Keep legal requirements, recommended practice and optional features distinct. England is configured; local authority and activity classification still require confirmation.
+- Keep changes and verification checkpointed to GitHub. Record failures and environmental limits in docs/VERIFICATION.md. Production readiness requires the launch evidence in docs/LAUNCH-READINESS.md.
 
-- **No Hallucinated UI**: Do not add non-functional buttons, placeholder toggles, dummy counters, or cosmetic telemetry. Every interactive affordance must have a working handler.
-- **Canine Domain Authenticity**: UI terminology must reflect natural pet owner language (e.g., "Playdate", "Zoomies", "Fetch", "Dog Park") rather than generic social media jargon.
-- **Anti-Slop Discipline**:
-  - Never wrap static metadata in capsule badges or pill boxes. Use unboxed text separated by subtle typographic dots (`·`).
-  - Maintain the 60-30-10 color allocation: 60% neutral canvas, 30% structural surfaces, 10% emerald accent.
-  - No decorative pulsing dots or arbitrary innovation scorecards.
+## Checks
 
-## 2. Technical Stack Conventions
+Platform: `.venv/bin/python platform/scripts/test.py`, `.venv/bin/python platform/scripts/test-core.py`, `node platform/scripts/browser-test.mjs`, dependency audit and CI deployment checks. Read TESTING.md for prerequisites and database isolation. Never run destructive test scripts on operational databases.
 
-- **Framework**: React 19 + TypeScript + Vite.
-- **Styling**: Tailwind CSS v4 (`@import "tailwindcss";`). Do not introduce secondary CSS modules or inline style blocks.
-- **Icons**: `lucide-react`. Maintain consistent icon size ($16\text{px}$–$24\text{px}$) and stroke width ($1.5$–$2.5$).
-- **Animations**: `motion/react` for card gestures and spring transitions.
-- **Sound**: Web Audio API (`src/utils/audio.ts`). Never add external `.mp3` or `.wav` dependencies that may fail over network boundaries.
-- **Prototype generators**: Preserve offline dog/cat text generation in `src/utils/gemini.ts`. Never expose a provider API key to the frontend. A future cloud integration needs a server endpoint.
+Prototype changes: `npm run lint`, `npm test`, `npm run build`, `npm run test:e2e`; APK checks when Android tools are available. Preserve intentional sample content and offline generators. Never put provider secrets in browser code.
 
-## 3. Android & Mobile Standards
-
-- **Touch Hitboxes**: Ensure all interactive controls have minimum touch targets of $44 \times 44\text{px}$.
-- **Ergonomics**: Keep primary action CTAs and navigation tabs within the bottom 40% thumb reach zone.
-- **WebAPK / PWA**: Maintain compliance with `vite-plugin-pwa` and Web App Manifest specifications in `vite.config.ts`.
-- **Android Gradle**: Keep the native Android project in `/android` synchronized with updates in package identifier (`com.tailwag.dogmatch`) and API target (SDK 34).
-
-## 4. Verification Workflow
-
-Before concluding any change:
-1. Run `npm run lint`, `npm test`, and `npm run build`.
-2. Run production browser tests with `npm run test:e2e` and build Android with `npm run build:apk` when tools are available.
-3. Report blocked checks honestly. Preserve intentional sample content and simulations; no production backend is required.
-4. Keep Android source in `/android`; generate exports from it instead of duplicating native templates.
+Use accessible controls, visible keyboard focus, reduced motion and responsive layouts. GitHub README supports links, badges, tables, details and diagrams, not arbitrary executable widgets.

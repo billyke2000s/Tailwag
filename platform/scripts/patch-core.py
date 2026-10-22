@@ -17,3 +17,6 @@ replace('src/static/js/main.js','When you use Move > Foster an animal, ASM will 
 replace('src/static/js/change_user_settings.js','$("#button-enable2fa").toggle(u.ENABLETOTP == 0);','$("#button-enable2fa").toggle(u.ENABLETOTP != 1);')
 replace('src/asm3/cachedisk.py','        os.unlink(fname)\n    except Exception as err:\n        asm3.al.error(str(err), "cachedisk.delete")','        os.unlink(fname)\n    except FileNotFoundError:\n        pass # An absent cache entry is an expected invalidation result\n    except Exception as err:\n        asm3.al.error(str(err), "cachedisk.delete")')
 (root/'src/static/css/tailwag.css').write_text((pathlib.Path(__file__).resolve().parents[1]/'static/staff.css').read_text())
+
+replace('src/asm3/users.py','if twofavalidcode == str(asm3.utils.totp(user.OTPSECRET)):','if twofavalidcode == str(asm3.utils.totp(user.OTPSECRET)).zfill(6):')
+replace('src/asm3/users.py','if onetimepass != str(asm3.utils.totp(user.OTPSECRET)):','if onetimepass != str(asm3.utils.totp(user.OTPSECRET)).zfill(6):')

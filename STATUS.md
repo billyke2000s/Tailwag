@@ -1,21 +1,18 @@
-# Status — 1.2.1 community repair edition
+# Delivery status
 
-The project remains a dog/cat playdate prototype with intentional test data and simulated matches, replies, park activity and playdates. No production backend or adoption/fostering conversion was added.
+Updated 22 October 2026. Operational work is on `feature/shelter-platform`; main and the v1.2.1 prototype/APK remain intact.
 
-## Verified locally
+| Capability | State | Evidence / next gate |
+|---|---|---|
+| Canonical animal/person/care/movement backend | Adopted pinned ASM | Selected domain tests; full organisation workflows still needed |
+| Public site and four enquiry types | Implemented | Integration tests; browser verification in progress |
+| Public privacy projection and fresh eligibility | Implemented | Flags/private-comment/image tests |
+| TOTP and staff application | Implemented | Native force-enrol fix; browser check in progress |
+| Conservative role templates | Implemented, unassigned | Full endpoint/object-boundary tests required |
+| Foster/sanctuary safeguards | Implemented selected paths | Tests pass; alternate/bulk/import paths still open |
+| Server image, proxy, PG and jobs | Prepared | PG install/restore, image build, Compose and Caddy passed in CI |
+| Backup and administrator recovery | Implemented scripts | Local SQLite restore passed; PG dump/restore passed in CI; real off-host drill pending |
+| Email, donation provider and PDF scanner | External configuration required | No real delivery/payment/scanning claim |
+| Real-world launch | Blocked | docs/LAUNCH-READINESS.md |
 
-- Clean npm lockfile installation succeeds without force or legacy peer resolution.
-- TypeScript checks pass.
-- Six Node regression tests pass.
-- Production build succeeds and includes all eight local fixture photos.
-- Android debug APK builds using the committed wrapper, Java 17 and SDK 34.
-- APK signature verifies and the archive contains bundled web assets, compiled classes and all eight local fixture photos.
-- The exported Android project builds independently after extraction.
-
-All eight production-browser regression tests pass, including offline loading, profile edits, chat continuity, filters, rapid swipes, meetup selection and preferences. Browser automation used Chromium headless shell; no physical Android device or emulator was available. A debug APK build and browser tests do not establish real-device behaviour or production readiness.
-
-## Limitations
-
-State is local to the browser/WebView, not synchronized across devices. External avatar/font requests use local/system fallbacks offline. Wingman uses local templates, not cloud AI. Debug signing is for tests; release signing and publication are separate owner-controlled steps.
-
-Destination repository: https://github.com/billyke2000s/Tailwag. Current publication and CI results must be checked on GitHub. Original source attribution and tracked upstream revision are in CREDITS.md and UPSTREAM.md. The original source repository has not been modified remotely.
+Confirmed scope: England, dogs/cats, mixed rescue/foster/sanctuary, no host selected. Local council, organisation identity, activity classification and real capacity are unresolved. The implementation must not be labelled production-ready until the evidence gaps close.
