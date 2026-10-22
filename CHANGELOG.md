@@ -5,6 +5,9 @@
 - Add an isolated, pinned ASM operational foundation and a responsive Django public site.
 - Connect four enquiry types to the native private inbox with receipts, duplicate protection and uncertain-write reconciliation.
 - Add publication privacy filters, selected placement safeguards, forced TOTP and zero-prefixed code fixes and bounded normal uploads.
+- Strengthen canonical passwords and legacy-hash upgrades; revoke stale password/privilege sessions and replace plaintext-email recovery with an audited administrator process.
+- Replace vulnerable loaded editor/browser libraries with integrity-pinned distributions and retained corresponding source; restrict sensitive foster reports.
+- Verify extracted candidate setup and backup success/failure handling while preserving pre-existing writer state.
 - Prepare PostgreSQL/container/proxy/jobs, migration, backup and recovery scripts; fix native view-version comparison and use reviewed non-destructive daily tasks.
 - Add source-backed England research, reuse/feature inventory, operational guides and explicit launch evidence gates.
 - Preserve the independent original prototype and v1.2.1 APK; no production deployment or operational-readiness claim.

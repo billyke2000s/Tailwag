@@ -31,3 +31,7 @@ Thirty integration checks passed after adding password policy, legacy-hash upgra
 Fresh source archive extraction also passed locally: Django metadata migrations, empty native bootstrap/upgrade, repeat preparation and explicitly synthetic seeding. The archive includes source/notices and excludes Git metadata, runtime records, secrets and generated schema databases. CI now repeats the extracted-source setup before publishing assets.
 
 Backup maintenance review fixed unconditional service restart and non-portable checksum paths. Synthetic Docker-stub checks passed for success, dump failure, originally stopped services, permissions and checksum verification. Actual off-host backup restoration remains unperformed.
+
+A separate isolated synthetic care rehearsal passed linked one-off scheduling, administration, attributed correction, audit actors and preservation of one treatment record. This was a direct native adapter rehearsal, not a full browser/clinical approval or duplicate-stock/concurrency test.
+
+Final checkpoint `6f1e25f` is awaiting [CI run 39823603416](https://github.com/billyke2000s/Tailwag/actions/runs/39823603416). At handover its dependency-install step remained in progress; no final pass or new release publication is claimed. Candidate publication is conditional on the complete pipeline, including the fresh-extraction and backup-wrapper checks. The earlier completed run remains the evidence for the production-settings smoke described above.
