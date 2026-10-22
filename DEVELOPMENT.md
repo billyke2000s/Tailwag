@@ -21,3 +21,5 @@ Initial user: `care-admin`. The generated password is in ignored `platform/runti
 Run verification in TESTING.md before opening a PR. Keep dependencies pinned and review advisories before updating. Add a migration for Django metadata changes; native schema upgrades use `upgrade-core.py`. Do not mutate copied vendor files without adding a repeatable patch. Production settings are described in DEPLOYMENT.md.
 
 The root React/PWA/Android prototype keeps its own `npm ci`, `npm run dev` and build commands. It is not the shelter's canonical backend and must not be connected to live care records casually.
+
+Optional formatting tools: `ruff==0.14.0` for Python and `prettier@3.6.2` for the browser verification script. Format only owned platform code; do not blanket-format the fetched vendor source. The checked patch anchors depend on that source remaining recognisable.

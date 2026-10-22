@@ -1,4 +1,6 @@
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE','shelter.settings')
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "shelter.settings")
 from django.core.wsgi import get_wsgi_application
-application=get_wsgi_application()
+
+application = get_wsgi_application()

@@ -6,6 +6,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: tailwag-platform-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
 jobs:
   platform:
     runs-on: ubuntu-latest
@@ -63,6 +66,8 @@ jobs:
         run: node platform/scripts/browser-test.mjs
       - name: Build deployment image
         run: docker build -t tailwag-care:ci platform
+      - name: Start applications with production settings
+        run: sh platform/scripts/test-deployment.sh
       - name: Validate server configuration
         working-directory: platform
         run: |

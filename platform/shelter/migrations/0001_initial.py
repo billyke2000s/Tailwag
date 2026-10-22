@@ -5,29 +5,38 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='RateWindow',
+            name="RateWindow",
             fields=[
-                ('key', models.CharField(max_length=64, primary_key=True, serialize=False)),
-                ('count', models.PositiveIntegerField(default=0)),
-                ('started_at', models.DateTimeField()),
+                (
+                    "key",
+                    models.CharField(max_length=64, primary_key=True, serialize=False),
+                ),
+                ("count", models.PositiveIntegerField(default=0)),
+                ("started_at", models.DateTimeField()),
             ],
         ),
         migrations.CreateModel(
-            name='Receipt',
+            name="Receipt",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('state', models.CharField(default='pending', max_length=12)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('core_id', models.IntegerField(null=True)),
-                ('kind', models.CharField(max_length=16)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("state", models.CharField(default="pending", max_length=12)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("core_id", models.IntegerField(null=True)),
+                ("kind", models.CharField(max_length=16)),
             ],
         ),
     ]

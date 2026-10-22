@@ -14,8 +14,8 @@ No live service or production-ready claim is made. An appointed organisation own
 | Uploads | Installed scanner, malicious/oversized/polyglot/error tests on every route | Normal image/PDF wrapper implemented; alternate paths outstanding |
 | Operations | Host, DNS, TLS, secrets, monitoring, patch owner and support escalation | No host selected |
 | Jobs/email | Real test sender, failure/retry reconciliation, UK daylight-saving schedule and interrupted-job drill | Scripts prepared; provider unconfigured |
-| Recovery | Fresh PG install, image build, migration, encrypted off-host backup, matching-version restore and recovery timings | Local SQLite test passed; PG/container checks pending |
-| Accessibility | Keyboard, screen-reader and phone/tablet care/application workflows | Initial browser checks pending; no WCAG conformance claim |
+| Recovery | Fresh PG install, image build, migration, encrypted off-host backup, matching-version restore and recovery timings | Local SQLite and CI PostgreSQL dump/restore, image build/config checks passed; off-host drill pending |
+| Accessibility | Keyboard, screen-reader and phone/tablet care/application workflows | Representative routes and enrolled dashboard passed at three sizes; no WCAG conformance claim |
 | Finance | Provider terms, verified hosted donation flow, accounting/reconciliation roles | Optional external link; no payment integration |
 | Attribution | Original creator reuse permission and retained third-party notices | Credits preserved; original root licence absent |
 
