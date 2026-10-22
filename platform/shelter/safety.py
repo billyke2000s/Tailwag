@@ -11,7 +11,9 @@ asm3.onlineform.get_collationid=next_collation
 
 def check_placement(dbo,post):
     kind=post.integer('type')
-    if kind not in (1,2) or not post.date('movementdate') or post.date('returndate') is not None:return
+    if kind<=0 or post.date('returndate') is not None:return
+    if dbo.query_int('SELECT COUNT(*) FROM adoption WHERE AnimalID = ? AND MovementType > 0 AND MovementDate IS NOT NULL AND ReturnDate IS NULL AND ID <> ?',[post.integer('animal'),post.integer('movementid')]):raise asm3.utils.ASMValidationError('Return the existing placement explicitly before creating another movement')
+    if kind not in (1,2):return
     animal=asm3.animal.get_animal(dbo,post.integer('animal'))
     if not animal or animal.get('DECEASEDDATE'):raise asm3.utils.ASMValidationError('A living animal record is required')
     if kind==1 and any(asm3.utils.cint(animal.get(k)) for k in ('ISNOTAVAILABLEFORADOPTION','ISHOLD','ISQUARANTINE','HASPERMANENTFOSTER')):raise asm3.utils.ASMValidationError('This animal is not cleared for adoption')
@@ -42,6 +44,12 @@ def foster(dbo,username,post):
     if dbo.query_int('SELECT COUNT(*) FROM adoption WHERE AnimalID = ? AND MovementDate IS NOT NULL AND ReturnDate IS NULL',[post.integer('animal')]):raise asm3.utils.ASMValidationError('Return the existing placement explicitly before arranging another foster move')
     return original_foster(dbo,username,post)
 asm3.movement.insert_foster_from_form=foster
+original_transfer=asm3.movement.insert_transfer_from_form
+@wraps(original_transfer)
+def transfer(dbo,username,post):
+    candidate=dict(post.data);candidate.update({'type':'3','movementdate':post['transferdate']});check_placement(dbo,asm3.utils.PostedData(candidate,dbo.locale))
+    return original_transfer(dbo,username,post)
+asm3.movement.insert_transfer_from_form=transfer
 original_upload=asm3.media.attach_file_from_form
 @wraps(original_upload)
 def upload(dbo,username,linktype,linkid,sourceid,post):

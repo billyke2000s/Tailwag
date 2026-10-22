@@ -98,3 +98,10 @@ class PlatformTests(TestCase):
         with patch('asm3.utils.totp',return_value=12345):
             asm3.users.update_user_settings(self.dbo,'care-admin',twofavalidcode='012345')
         self.assertEqual(self.dbo.query_int("SELECT EnableTOTP FROM users WHERE UserName = 'care-admin'"),1)
+
+    def test_adoption_and_transfer_do_not_silently_end_foster(self):
+        aid=self.animal();pid=self.person();mid=self.foster(aid,pid)
+        for fn,datefield in [(asm3.movement.insert_adoption_from_form,'movementdate'),(asm3.movement.insert_transfer_from_form,'transferdate')]:
+            with self.assertRaises(asm3.utils.ASMValidationError):fn(self.dbo,'test',asm3.utils.PostedData({'animal':str(aid),'person':str(pid),datefield:'02/10/2026'},'en_GB'))
+            self.assertIsNone(self.dbo.query_date('SELECT ReturnDate FROM adoption WHERE ID = ?',[mid]))
+        self.assertEqual(self.dbo.query_int('SELECT COUNT(*) FROM adoption'),1)

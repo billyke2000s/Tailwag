@@ -24,6 +24,6 @@ Inventory based on the [ASM 52u manual index](https://sheltermanager.com/repo/as
 | Imports, CSV, database maintenance, lookups and configuration | Retained/restricted | Admin only; reviewed mapping/restore and alternate-path checks required |
 | Users, roles, settings, TOTP, audit and recovery | Adapted | Forced enrolment fix, safe defaults and role templates; complete endpoint/object tests open |
 | Native mobile interface and responsive private screens | Retained/adapted | Scoped stylesheet; representative smoke checks, full workflow accessibility open |
-| Daily cron, notifications, news and downloaded reports | Adapted/gated | Local daily worker; remote report/news updates disabled; provider/error/retry verification required |
+| Daily cron, notifications, news and downloaded reports | Adapted/gated | Reviewed local daily worker; automatic deletion/anonymisation/hold expiry and remote downloads/publishing excluded; provider/error/retry verification required |
 
 No upstream code groups were silently deleted. Unnecessary public/native service endpoints are blocked at the WSGI/proxy boundary. Gated modules remain source-visible for maintainability but should not receive staff permissions until justified and verified. The new public projection and original prototype are separately documented.

@@ -4,7 +4,7 @@ Restored source revision checked on 22 October 2026. The workspace reset destroy
 
 | Check | Actual result |
 |---|---|
-| Platform integration suite | 25 passed, 7.309 seconds; isolated SQLite/native database |
+| Platform integration suite | 26 passed, 9.077 seconds; isolated SQLite/native database |
 | Selected ASM domain suite | 391 passed, 256.472 seconds; reset per test; outbound email stubbed |
 | Browser checks | Public checks passed; stricter TOTP persistence check added after screenshot review; actual staff dashboard overflow under repair |
 | Dependency advisory scan | No known vulnerabilities found for the locked Python packages |

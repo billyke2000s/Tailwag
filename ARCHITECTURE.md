@@ -34,4 +34,6 @@ The native core performs some operations using multiple statements/connections. 
 
 Generic native service/web-install endpoints are blocked. Unsafe remember-me storage is disabled. Forced TOTP enrolment is corrected for new accounts. Normal uploads are bounded, images re-encoded and PDFs gated on a scanner. Alternate import/attachment routes require further review. Logs suppress native record contents, reducing diagnostic detail in exchange for privacy.
 
+The reviewed daily task list updates statuses, ages, figures and matching reports. It deliberately excludes automatic record/audit deletion, anonymisation, hold/reservation expiry, remote downloads and publishers. Notification tasks require NOTIFICATIONS_ENABLED=true and configured SMTP.
+
 Jobs attempt once daily after 04:00 Europe/London. An attempt marker is written before execution; failure requires reconciliation. This avoids blind re-execution of partly completed native work. Real email delivery and interruption recovery remain release gates.

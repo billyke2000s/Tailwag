@@ -13,7 +13,7 @@ node platform/scripts/browser-test.mjs
 .venv/bin/python -m pip_audit -r platform/requirements.txt
 ```
 
-The 25 integration tests cover real native incoming forms, repeated submission tokens, CSRF, invalid input, abuse limits, uncertain writes, private publication flags, images, sanctuary adoption guards, assessed foster households, capacity, explicit returns, role templates, safe logs and SQLite restore. The selected 391 native domain tests reset the database per case; outbound email is stubbed. They do not exercise every native feature or prove mail delivery.
+The 26 integration tests cover real native incoming forms, repeated submission tokens, CSRF, invalid input, abuse limits, uncertain writes, private publication flags, images, sanctuary adoption guards, assessed foster households, capacity, explicit returns, role templates, safe logs zero-prefixed TOTP and SQLite restore. The selected 391 native domain tests reset the database per case; outbound email is stubbed. They do not exercise every native feature or prove mail delivery.
 
 Browser automation creates its own databases, enrols TOTP using a generated secret without printing it, verifies a real enquiry, keyboard skip navigation and representative desktop/tablet/phone routes, then removes runtime secrets. Screenshots contain synthetic data only. `CHROMIUM_PATH` optionally selects an installed browser. Use Playwright's bundled browser in CI.
 

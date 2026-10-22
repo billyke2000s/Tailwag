@@ -8,5 +8,8 @@ core=database()
 if asm3.dbupdate.check_for_updates(core):
     _,failed=asm3.dbupdate.perform_updates(core)
     if failed:raise SystemExit('Migration failed; keep traffic stopped and restore a verified backup')
-if asm3.dbupdate.check_for_view_seq_changes(core):asm3.dbupdate.install_db_views(core);asm3.dbupdate.install_db_sequences(core)
+if asm3.dbupdate.check_for_view_seq_changes(core):
+    if asm3.dbupdate.install_db_views(core) or asm3.dbupdate.install_db_sequences(core):raise SystemExit('View/sequence migration failed; keep traffic stopped')
+    asm3.dbupdate.install_db_stored_procedures(core)
+if asm3.dbupdate.check_for_updates(core) or asm3.dbupdate.check_for_view_seq_changes(core):raise SystemExit('Schema remains pending after upgrade')
 print('Core schema current')

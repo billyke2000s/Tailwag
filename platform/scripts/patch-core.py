@@ -20,3 +20,7 @@ replace('src/asm3/cachedisk.py','        os.unlink(fname)\n    except Exception 
 
 replace('src/asm3/users.py','if twofavalidcode == str(asm3.utils.totp(user.OTPSECRET)):','if twofavalidcode == str(asm3.utils.totp(user.OTPSECRET)).zfill(6):')
 replace('src/asm3/users.py','if onetimepass != str(asm3.utils.totp(user.OTPSECRET)):','if onetimepass != str(asm3.utils.totp(user.OTPSECRET)).zfill(6):')
+
+replace('src/static/js/main.js','When you use Move > Adopt an animal, ASM will automatically return any open foster or retailer movement before creating the adoption.','Return the existing placement explicitly before creating an adoption. Keep the return reason and date in the animal history.')
+
+replace('src/asm3/dbupdate.py','return asm3.configuration.db_view_seq_version(dbo) != str(_dbupdates_latest_ver(dbo))','return asm3.configuration.db_view_seq_version(dbo) != _dbupdates_latest_ver(dbo)')

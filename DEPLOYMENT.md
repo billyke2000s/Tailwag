@@ -26,7 +26,7 @@ Set DNS to the host and permit TLS issuance before opening traffic. Confirm both
 
 ## External configuration
 
-SMTP_* needs a provider account, authenticated sender, TLS and verified test delivery/failure handling. The public confirmation is an on-screen receipt, not proof of sent email. Donation links appear only when DONATE_URL points to a verified HTTPS provider; no integrated payment webhook is implemented. Native third-party publishing and generic API remain disabled. PDFs require a real UPLOAD_SCANNER executable installed in a custom image and verified reject/error behaviour. Do not enable a scanner setting that accepts every file.
+NOTIFICATIONS_ENABLED defaults false. Enable it only after testing actual delivery and failure/reconciliation handling. SMTP_* needs a provider account, authenticated sender, TLS and verified test delivery/failure handling. The public confirmation is an on-screen receipt, not proof of sent email. Donation links appear only when DONATE_URL points to a verified HTTPS provider; no integrated payment webhook is implemented. Native third-party publishing and generic API remain disabled. PDFs require a real UPLOAD_SCANNER executable installed in a custom image and verified reject/error behaviour. Do not enable a scanner setting that accepts every file.
 
 ## Upgrade and rollback
 
