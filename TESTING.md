@@ -5,6 +5,7 @@ Install DEVELOPMENT.md prerequisites. Tests use generated synthetic data and iso
 ```sh
 .venv/bin/python platform/scripts/test.py
 .venv/bin/python platform/scripts/test-core.py
+.venv/bin/python platform/scripts/test-backup.py
 npm ci
 npx playwright install --with-deps chromium
 node platform/scripts/browser-test.mjs
@@ -22,3 +23,5 @@ Browser automation creates its own databases, enrols TOTP using a generated secr
 The platform workflow additionally checks container build, fresh production-settings application startup, Compose expansion and Caddy syntax. These are deployment preparation, not evidence of a running production server. See docs/VERIFICATION.md for actual results and docs/LAUNCH-READINESS.md for unverified workflows.
 
 Prototype checks remain `npm run lint`, `npm test`, `npm run build`, `npm run test:e2e`. Android compile/signing belongs to the independent APK workflow.
+
+The backup-wrapper test stubs Docker to exercise successful dumps, dump failure, pre-existing stopped services, private file permissions and portable checksums. It does not claim a live backup or replace the PostgreSQL/off-host restoration drills.

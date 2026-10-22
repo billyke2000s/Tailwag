@@ -34,7 +34,7 @@ Pin and build a reviewed image, read CHANGELOG.md and upstream schema changes, s
 
 ## Backup and recovery
 
-Run `sh scripts/backup.sh /absolute/private/backup-dir` from platform/. It stops cooperating app writers, creates a custom-format PostgreSQL dump and checksum, and restarts them. The dump contains private records and media: encrypt it and copy it off-host using an independently secured destination. Encryption, scheduling, monitoring and off-host credentials are operator configuration, not built into this script. Record key custody and retention.
+Run `sh scripts/backup.sh /absolute/private/backup-dir` from platform/. It stops cooperating app writers, creates a custom-format PostgreSQL dump and checksum, and resumes only services that were running before maintenance, including after a dump failure. Checksums use portable filenames; verify them from the backup directory. The dump contains private records and media: encrypt it and copy it off-host using an independently secured destination. Encryption, scheduling, monitoring and off-host credentials are operator configuration, not built into this script. Record key custody and retention.
 
 Use a separate empty stack and `sh scripts/restore.sh backup.dump --confirm-isolated-empty-database`. Verify the checksum first. Restore is refused when tables already exist. Inspect record counts, representative care/movement histories, media, permissions and pending enquiries. Measure recovery time and loss window. See docs/operations/RECOVERY.md.
 

@@ -83,7 +83,8 @@ def credential_stamp(dbo, username):
 
     users = dbo.query(
         "SELECT ID, Password, SuperUser, DisableLogin, OwnerID, SiteID, LocationFilter, IPRestriction "
-        "FROM users WHERE UserName = ?", [username]
+        "FROM users WHERE UserName = ?",
+        [username],
     )
     if not users or users[0].DISABLELOGIN:
         return ""
@@ -91,7 +92,8 @@ def credential_stamp(dbo, username):
     roles = dbo.query(
         "SELECT role.ID, role.SecurityMap FROM role "
         "INNER JOIN userrole ON role.ID = userrole.RoleID "
-        "WHERE userrole.UserID = ? ORDER BY role.ID", [user.ID]
+        "WHERE userrole.UserID = ? ORDER BY role.ID",
+        [user.ID],
     )
     # Native permissions and location filters are cached in the session. Force a
     # fresh login whenever their canonical values change, including role edits.

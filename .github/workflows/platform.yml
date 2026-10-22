@@ -53,6 +53,8 @@ jobs:
           .venv/bin/python -m compileall -q platform/shelter platform/scripts
       - name: Connected workflow tests
         run: .venv/bin/python platform/scripts/test.py
+      - name: Backup maintenance failure handling
+        run: .venv/bin/python platform/scripts/test-backup.py
       - name: Adopted domain tests
         run: .venv/bin/python platform/scripts/test-core.py
       - name: PostgreSQL install, migration and restore
