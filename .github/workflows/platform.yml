@@ -91,6 +91,14 @@ jobs:
           tar --exclude='platform/runtime' --exclude='platform/staticfiles' --exclude='__pycache__' --exclude='*.pyc' --exclude='platform/vendor/asm/scripts/schema/schema.db' --exclude='.env' --exclude='.git' -czf release-care/TailWag-Care-0.1.0-alpha.1-source.tar.gz platform *.md docs .github/workflows/platform.yml
           cd release-care
           sha256sum *.tar.gz > SHA256SUMS.txt
+      - name: Verify extracted candidate setup
+        if: github.event_name == 'push'
+        run: |
+          SOURCE_TEST=$(mktemp -d)
+          tar -xzf release-care/TailWag-Care-0.1.0-alpha.1-source.tar.gz -C "$SOURCE_TEST"
+          .venv/bin/python "$SOURCE_TEST/platform/scripts/dev.py" --prepare
+          .venv/bin/python "$SOURCE_TEST/platform/scripts/dev.py" --seed
+          test -f "$SOURCE_TEST/platform/runtime/core.sqlite3"
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'push'
         with:

@@ -101,7 +101,7 @@ Role templates are unassigned starting points. The complete server-side permissi
 | [Architecture](ARCHITECTURE.md) | [Deployment and rollback](DEPLOYMENT.md) | [Launch gates](docs/LAUNCH-READINESS.md) |
 | [Current progress](STATUS.md) | [Staff guide](docs/operations/STAFF.md) | [Decisions](DECISIONS.md) |
 | [Contributing](CONTRIBUTING.md) | [Administration](docs/operations/ADMINISTRATION.md) | [Credits](CREDITS.md) / [upstream](UPSTREAM.md) |
-| [Agent instructions](AGENTS.md) | [Recovery](docs/operations/RECOVERY.md) | [History](CHANGELOG.md) / [licences](THIRD-PARTY.md) |
+| [Agent instructions](AGENTS.md) | [Recovery](docs/operations/RECOVERY.md) / [acceptance rehearsal](docs/operations/ACCEPTANCE.md) | [History](CHANGELOG.md) / [licences](THIRD-PARTY.md) |
 
 <details>
 <summary><strong>Original React / PWA / Android demonstration</strong></summary>

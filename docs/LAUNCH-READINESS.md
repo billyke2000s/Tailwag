@@ -11,7 +11,7 @@ No live service or production-ready claim is made. An appointed organisation own
 | Capacity/compatibility | Rooms/enclosures/foster household capacity, species and compatibility, concurrent/interrupt tests | Selected household checks only; no universal guarantee |
 | Access | Endpoint/object tests for every role, exports, search, media, reports, permissions | Role templates unassigned; foster-only logins gated |
 | Privacy | Controller notice, lawful bases, minimisation, retention schedule, legal holds, correction/export/deletion drill | Candidate notice; actual policy not approved |
-| Browser assets | Editor migration/save/print and remaining native widgets security review | Pinned replacements; editor verification in progress; full inventory not cleared |
+| Browser assets | Editor migration/save/print and remaining native widgets security review | Pinned replacements; editor save/reload and basic sanitisation passed; print/PDF/signature paths and full inventory not cleared |
 | Uploads | Installed scanner, malicious/oversized/polyglot/error tests on every route | Normal image/PDF wrapper implemented; alternate paths outstanding |
 | Operations | Host, DNS, TLS, secrets, monitoring, patch owner and support escalation | No host selected |
 | Jobs/email | Real test sender, failure/retry reconciliation, UK daylight-saving schedule and interrupted-job drill | Scripts prepared; provider unconfigured |
@@ -21,3 +21,5 @@ No live service or production-ready claim is made. An appointed organisation own
 | Attribution | Original creator reuse permission and retained third-party notices | Credits preserved; original root licence absent |
 
 Do not work around these gates with fake metrics, seed data presented as real residents or unattended retries of uncertain care writes. Public/demo use requires clear labelling and access restrictions. Record a named owner and dated evidence for each closed gate.
+
+Run the concrete rehearsal in [organisation acceptance](operations/ACCEPTANCE.md) with synthetic data. Record actual results and protected evidence; the procedure itself does not close a gate.

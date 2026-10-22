@@ -16,7 +16,7 @@ The selected native suite excludes network-dependent and shared-fixture paths. A
 
 The first CI run used the earlier 24-test suite and a weaker staff browser assertion. Its infrastructure checks are valid evidence; its staff/TOTP screenshot result is superseded by the stricter test. The local 25-test rerun includes zero-prefixed TOTP enrolment.
 
-The stricter browser rerun inspected the actual enrolled dashboard and fixed footer overflow. Permission denial now returns HTTP 403 rather than the native misleading HTTP 500. The daily-job smoke exposed and fixed an int/string view-version mismatch. Automatic native deletion, audit pruning, anonymisation, hold expiry and publishing are excluded from the reviewed task list. The production-settings container start is a new CI check and remains pending.
+The stricter browser rerun inspected the actual enrolled dashboard and fixed footer overflow. Permission denial now returns HTTP 403 rather than the native misleading HTTP 500. The daily-job smoke exposed and fixed an int/string view-version mismatch. Automatic native deletion, audit pruning, anonymisation, hold expiry and publishing are excluded from the reviewed task list. The production-settings container start passed in [CI run 39821015852](https://github.com/billyke2000s/Tailwag/actions/runs/39821015852): fresh migrations/bootstrap/upgrade and daily jobs, Django deployment checks, reachable public health and staff login, and no seeded animals. This is a disposable runner test, not a real hosting deployment.
 
 Public receipt references are now retained in the native incoming form fields as well as technical metadata, so staff can reconcile an uncertain write using the exact reference. The integration suite checks that link for all four enquiry types.
 
@@ -27,3 +27,5 @@ A separate review identified the loaded TinyMCE 5.5.1 XSS advisory. Publication 
 ## Account and report hardening
 
 Thirty integration checks passed after adding password policy, legacy-hash upgrade, sensitive foster-report ACL and canonical privilege-stamp tests. The selected 391 native checks passed in 254.533 seconds after password hashing changes. The browser rerun confirmed password-change revocation and legacy recovery rejection. The subsequent browser rerun passed actual role-change session revocation as well. Canonical role assignments/maps and account access restrictions are included in the session stamp. No email delivery, private identity recovery or complete permission-matrix claim follows from these checks.
+
+Fresh source archive extraction also passed locally: Django metadata migrations, empty native bootstrap/upgrade, repeat preparation and explicitly synthetic seeding. The archive includes source/notices and excludes Git metadata, runtime records, secrets and generated schema databases. CI now repeats the extracted-source setup before publishing assets.

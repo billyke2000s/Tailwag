@@ -19,6 +19,6 @@ Browser automation creates its own databases, enrols TOTP using a generated secr
 
 `platform/scripts/test-postgres.py` requires an EMPTY PostgreSQL database whose name ends `_test`, PostgreSQL client tools and a user able to create/drop the isolated restore database. It checks fresh migration/bootstrap, sequence allocation, real submissions and dump/restore. It refuses a pre-existing `tailwag_restore_test` database.
 
-The platform workflow additionally checks container build, Compose expansion and Caddy syntax. These are deployment preparation, not evidence of a running production server. See docs/VERIFICATION.md for actual results and docs/LAUNCH-READINESS.md for unverified workflows.
+The platform workflow additionally checks container build, fresh production-settings application startup, Compose expansion and Caddy syntax. These are deployment preparation, not evidence of a running production server. See docs/VERIFICATION.md for actual results and docs/LAUNCH-READINESS.md for unverified workflows.
 
 Prototype checks remain `npm run lint`, `npm test`, `npm run build`, `npm run test:e2e`. Android compile/signing belongs to the independent APK workflow.
