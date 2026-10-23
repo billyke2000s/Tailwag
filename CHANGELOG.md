@@ -6,6 +6,7 @@
 - Check future foster occupancy and peak concurrent capacity; retain valid history and explicit returns.
 - Expand care/audit, simultaneous staff placement and PostgreSQL lock verification; use HTTP 400 for invalid native input.
 - Include browser-test npm manifests in the operational source archive.
+- Update Brotli to 1.2.1 after the locked-dependency audit identified the upstream decoder security fix.
 
 ## care-v0.1.0-alpha.1 — 22 October 2026 · evaluation prerelease
 
