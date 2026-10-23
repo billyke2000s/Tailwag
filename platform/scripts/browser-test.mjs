@@ -292,31 +292,64 @@ try {
   );
   if (oldAsset.status() !== 404)
     throw Error("Vulnerable legacy asset is still served");
-  const fosterPerson = Number(run([
-    "-c",
-    "from shelter.core import database; import asm3.person,asm3.utils; d=database(); p=asm3.person.insert_person_from_form(d,asm3.utils.PostedData({'surname':'Synthetic concurrency household','forenames':'Test'},'en_GB'),'browser-test',geocode=False); d.update('owner',p,{'IDCheck':1,'IsFosterer':1,'FosterCapacity':1}); print(p)",
-  ]));
-  const fosterDate = new Intl.DateTimeFormat("en-GB", {timeZone: "Europe/London"}).format(new Date());
-  const fosterRequest = (animal) => page.request.post("http://localhost:5000/move_foster", {
-    headers: {Origin: "http://localhost:5000"},
-    form: {mode: "create", animal: String(animal), person: String(fosterPerson), fosterdate: fosterDate},
-  });
+  const fosterPerson = Number(
+    run([
+      "-c",
+      "from shelter.core import database; import asm3.person,asm3.utils; d=database(); p=asm3.person.insert_person_from_form(d,asm3.utils.PostedData({'surname':'Synthetic concurrency household','forenames':'Test'},'en_GB'),'browser-test',geocode=False); d.update('owner',p,{'IDCheck':1,'IsFosterer':1,'FosterCapacity':1}); print(p)",
+    ]),
+  );
+  const fosterDate = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London",
+  }).format(new Date());
+  const fosterRequest = (animal) =>
+    page.request.post("http://localhost:5000/move_foster", {
+      headers: { Origin: "http://localhost:5000" },
+      form: {
+        mode: "create",
+        animal: String(animal),
+        person: String(fosterPerson),
+        fosterdate: fosterDate,
+      },
+    });
   const moves = await Promise.all([fosterRequest(1), fosterRequest(2)]);
-  if (moves.map(r => r.status()).sort().join(",") !== "200,400")
-    throw Error("Concurrent foster capacity was not enforced: " + moves.map(r => r.status()).join(","));
+  if (
+    moves
+      .map((r) => r.status())
+      .sort()
+      .join(",") !== "200,400"
+  )
+    throw Error(
+      "Concurrent foster capacity was not enforced: " +
+        moves.map((r) => r.status()).join(","),
+    );
   const winner = moves[0].status() === 200 ? 1 : 2;
   const loser = winner === 1 ? 2 : 1;
   const moveID = Number(await moves[winner - 1].text());
   if (!moveID) throw Error("Foster movement ID missing");
   const forged = await page.request.post("http://localhost:5000/move_adopt", {
-    headers: {Origin: "http://localhost:5000"},
-    form: {mode: "create", animal: String(winner), person: String(fosterPerson), movementdate: fosterDate, returndate: fosterDate, movementid: String(moveID)},
+    headers: { Origin: "http://localhost:5000" },
+    form: {
+      mode: "create",
+      animal: String(winner),
+      person: String(fosterPerson),
+      movementdate: fosterDate,
+      returndate: fosterDate,
+      movementid: String(moveID),
+    },
   });
-  if (forged.status() !== 400) throw Error("Ignored adoption fields bypassed the guard");
-  run(["-c", `from shelter.core import database; import asm3.movement; d=database(); assert d.query_int("SELECT COUNT(*) FROM adoption WHERE OwnerID = ? AND ReturnDate IS NULL",[${fosterPerson}])==1; assert d.query_date("SELECT ReturnDate FROM adoption WHERE ID = ?",[${moveID}]) is None; asm3.movement.return_movement(d,${moveID},'browser-test',returndate=d.today())`]);
+  if (forged.status() !== 400)
+    throw Error("Ignored adoption fields bypassed the guard");
+  run([
+    "-c",
+    `from shelter.core import database; import asm3.movement; d=database(); assert d.query_int("SELECT COUNT(*) FROM adoption WHERE OwnerID = ? AND ReturnDate IS NULL",[${fosterPerson}])==1; assert d.query_date("SELECT ReturnDate FROM adoption WHERE ID = ?",[${moveID}]) is None; asm3.movement.return_movement(d,${moveID},'browser-test',returndate=d.today())`,
+  ]);
   const afterReturn = await fosterRequest(loser);
-  if (afterReturn.status() !== 200) throw Error("Explicit return did not release foster capacity");
-  run(["-c", `from shelter.core import database; d=database(); assert d.query_int("SELECT COUNT(*) FROM adoption WHERE OwnerID = ?",[${fosterPerson}])==2; assert d.query_date("SELECT ReturnDate FROM adoption WHERE ID = ?",[${moveID}]) is not None`]);
+  if (afterReturn.status() !== 200)
+    throw Error("Explicit return did not release foster capacity");
+  run([
+    "-c",
+    `from shelter.core import database; d=database(); assert d.query_int("SELECT COUNT(*) FROM adoption WHERE OwnerID = ?",[${fosterPerson}])==2; assert d.query_date("SELECT ReturnDate FROM adoption WHERE ID = ?",[${moveID}]) is not None`,
+  ]);
   await page.goto("http://localhost:5000/change_password");
   await page.locator("#oldpassword").fill(password);
   const changedPassword = randomBytes(24).toString("hex");
@@ -408,10 +441,16 @@ try {
         "-c",
         "from shelter.core import database; d=database(); d.execute(\"UPDATE role SET SecurityMap = '' WHERE RoleName = 'Volunteer'\")",
       ]);
-      const revokedRole = await context.request.get("http://localhost:5000/main", {
-        maxRedirects: 0,
-      });
-      if (revokedRole.status() !== 303 || !revokedRole.headers()["location"]?.includes("/login"))
+      const revokedRole = await context.request.get(
+        "http://localhost:5000/main",
+        {
+          maxRedirects: 0,
+        },
+      );
+      if (
+        revokedRole.status() !== 303 ||
+        !revokedRole.headers()["location"]?.includes("/login")
+      )
         throw Error("Changed role did not revoke cached permissions");
     }
     await context.close();

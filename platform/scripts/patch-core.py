@@ -229,6 +229,6 @@ replace(
 )
 replace(
     "src/main.py",
-    '''        asm3.al.debug("%s changed settings: theme=%s, locale=%s, realname=%s, email=%s, quicklinks=%s, twofacode=%s, twofapass=%s" % (o.user, theme, locale, realname, email, quicklinks, twofavalidcode, twofavalidpassword), "main.change_password", o.dbo)''',
-    '''        asm3.al.debug("Account settings changed", "main.change_user_settings", o.dbo)''',
+    """        asm3.al.debug("%s changed settings: theme=%s, locale=%s, realname=%s, email=%s, quicklinks=%s, twofacode=%s, twofapass=%s" % (o.user, theme, locale, realname, email, quicklinks, twofavalidcode, twofavalidpassword), "main.change_password", o.dbo)""",
+    """        asm3.al.debug("Account settings changed", "main.change_user_settings", o.dbo)""",
 )

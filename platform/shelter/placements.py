@@ -48,15 +48,26 @@ def check_placement(dbo, post):
     ongoing = end is None or end > dbo.today()
     if ongoing and animal.get("DECEASEDDATE"):
         raise asm3.utils.ASMValidationError("A living animal record is required")
-    if ongoing and kind == 1 and any(
-        asm3.utils.cint(animal.get(key))
-        for key in ("ISNOTAVAILABLEFORADOPTION", "ISHOLD", "ISQUARANTINE", "HASPERMANENTFOSTER")
+    if (
+        ongoing
+        and kind == 1
+        and any(
+            asm3.utils.cint(animal.get(key))
+            for key in (
+                "ISNOTAVAILABLEFORADOPTION",
+                "ISHOLD",
+                "ISQUARANTINE",
+                "HASPERMANENTFOSTER",
+            )
+        )
     ):
         raise asm3.utils.ASMValidationError("This animal is not cleared for adoption")
-    person = dbo.first_row(dbo.query(
-        "SELECT ID, IDCheck, FosterCapacity, IsFosterer FROM owner WHERE ID = ?",
-        [post.integer("person")],
-    ))
+    person = dbo.first_row(
+        dbo.query(
+            "SELECT ID, IDCheck, FosterCapacity, IsFosterer FROM owner WHERE ID = ?",
+            [post.integer("person")],
+        )
+    )
     if not person or not person.IDCHECK:
         raise asm3.utils.ASMValidationError(
             "A recorded household assessment is required before placement"
@@ -85,4 +96,6 @@ def check_placement(dbo, post):
     for date in sorted(changes):
         count += changes[date]
         if count > capacity:
-            raise asm3.utils.ASMValidationError("Approved foster capacity is unavailable for these dates")
+            raise asm3.utils.ASMValidationError(
+                "Approved foster capacity is unavailable for these dates"
+            )

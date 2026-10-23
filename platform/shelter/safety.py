@@ -68,7 +68,9 @@ original_foster = asm3.movement.insert_foster_from_form
 @wraps(original_foster)
 def foster(dbo, username, post):
     candidate = dict(post.data)
-    candidate.update({"type": "2", "movementdate": post["fosterdate"], "movementid": ""})
+    candidate.update(
+        {"type": "2", "movementdate": post["fosterdate"], "movementid": ""}
+    )
     check_placement(dbo, asm3.utils.PostedData(candidate, dbo.locale))
     if dbo.query_int(
         "SELECT COUNT(*) FROM adoption WHERE AnimalID = ? AND MovementDate IS NOT NULL AND ReturnDate IS NULL",
@@ -87,7 +89,14 @@ original_transfer = asm3.movement.insert_transfer_from_form
 @wraps(original_transfer)
 def transfer(dbo, username, post):
     candidate = dict(post.data)
-    candidate.update({"type": "3", "movementdate": post["transferdate"], "returndate": "", "movementid": ""})
+    candidate.update(
+        {
+            "type": "3",
+            "movementdate": post["transferdate"],
+            "returndate": "",
+            "movementid": "",
+        }
+    )
     check_placement(dbo, asm3.utils.PostedData(candidate, dbo.locale))
     return original_transfer(dbo, username, post)
 

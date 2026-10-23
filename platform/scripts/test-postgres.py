@@ -62,6 +62,72 @@ with tempfile.TemporaryDirectory(prefix="care-pg-test-") as tmp:
         )
         == 2
     )
+    # Exercise the same advisory-writer boundary used by real staff POSTs.
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+    import asm3.animal, asm3.person, asm3.movement, asm3.utils, asm3.i18n
+
+    dbo = core.database()
+    person = asm3.person.insert_person_from_form(
+        dbo,
+        asm3.utils.PostedData(
+            {"surname": "Synthetic PG concurrency household", "forenames": "Test"},
+            "en_GB",
+        ),
+        "pg-test",
+        geocode=False,
+    )
+    dbo.update("owner", person, {"IDCheck": 1, "IsFosterer": 1, "FosterCapacity": 1})
+    animal_ids = [
+        asm3.animal.insert_animal_from_form(
+            dbo,
+            asm3.utils.PostedData(
+                {
+                    "animalname": "Synthetic PG capacity " + str(i),
+                    "animaltype": "1",
+                    "species": "1",
+                    "estimatedage": "2",
+                    "entryreason": "1",
+                },
+                "en_GB",
+            ),
+            "pg-test",
+        )[0]
+        for i in range(2)
+    ]
+    ready = Barrier(2)
+
+    def place(animal):
+        ready.wait(timeout=10)
+        try:
+            with writer_lock():
+                db = core.database()
+                asm3.movement.insert_foster_from_form(
+                    db,
+                    "pg-test",
+                    asm3.utils.PostedData(
+                        {
+                            "animal": str(animal),
+                            "person": str(person),
+                            "fosterdate": asm3.i18n.python2display("en_GB", db.today()),
+                        },
+                        "en_GB",
+                    ),
+                )
+            return "placed"
+        except asm3.utils.ASMValidationError:
+            return "rejected"
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(place, animal_ids))
+    assert sorted(results) == ["placed", "rejected"], results
+    assert (
+        dbo.query_int(
+            "SELECT COUNT(*) FROM adoption WHERE OwnerID = ? AND MovementType = 2 AND ReturnDate IS NULL",
+            [person],
+        )
+        == 1
+    )
     subprocess.run(
         ["pg_dump", "--format=custom", "--file", tmp + "/care.dump", name],
         env=env,
@@ -96,8 +162,15 @@ with tempfile.TemporaryDirectory(prefix="care-pg-test-") as tmp:
                     "SELECT COUNT(DISTINCT CollationID) FROM onlineformincoming"
                 )
                 assert cursor.fetchone()[0] == 2
+                cursor.execute(
+                    "SELECT COUNT(*) FROM adoption WHERE OwnerID = %s AND MovementType = 2 AND ReturnDate IS NULL",
+                    [person],
+                )
+                assert cursor.fetchone()[0] == 1
     finally:
         with admin.cursor() as cursor:
             cursor.execute("DROP DATABASE IF EXISTS tailwag_restore_test WITH (FORCE)")
         admin.close()
-print("PostgreSQL installation, migration, shared IDs, submissions and restore passed")
+print(
+    "PostgreSQL installation, migration, shared IDs, submissions, concurrent foster capacity and restore passed"
+)
