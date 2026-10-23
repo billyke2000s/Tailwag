@@ -8,7 +8,7 @@ No live service or production-ready claim is made. An appointed organisation own
 | Licensing | Applicable activity/business test and council confirmation; licence/inspection where required | Research recorded; no blanket rescue-licence assumption |
 | Care SOPs | Vet-authorised treatment, infection isolation, feeding/enrichment, welfare escalation, incident/death procedures | Native records available; organisational SOP approval outstanding |
 | Lifecycle integrity | Intake through assessment, medical care, foster, adoption, return, transfer, sanctuary, death; invalid transitions and all bulk/import paths | Selected tests only |
-| Capacity/compatibility | Rooms/enclosures/foster household capacity, species and compatibility, concurrent/interrupt tests | Selected household checks only; no universal guarantee |
+| Capacity/compatibility | Rooms/enclosures/foster household capacity, species and compatibility, concurrent/interrupt tests | Dated household/peak-capacity and simultaneous staff/PG checks passed; premises, intraday compatibility and interrupted-write coverage remain open |
 | Access | Endpoint/object tests for every role, exports, search, media, reports, permissions | Role templates unassigned; foster-only logins gated |
 | Privacy | Controller notice, lawful bases, minimisation, retention schedule, legal holds, correction/export/deletion drill | Candidate notice; actual policy not approved |
 | Browser assets | Editor migration/save/print and remaining native widgets security review | Pinned replacements; editor save/reload and basic sanitisation passed; print/PDF/signature paths and full inventory not cleared |

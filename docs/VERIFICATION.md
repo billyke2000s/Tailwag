@@ -1,5 +1,9 @@
 # Verification record
 
+Latest evaluation release: [care-v0.1.0-alpha.2](https://github.com/billyke2000s/Tailwag/releases/tag/care-v0.1.0-alpha.2), verified in the 23 October section below.
+
+## 22 October 2026 — historical alpha.1 evidence
+
 Restored source revision checked on 22 October 2026. The workspace reset destroyed earlier unpublished files and screenshots; those earlier results are not substituted for reruns of the reconstructed code.
 
 | Check | Actual result |
@@ -44,8 +48,29 @@ A separate local synthetic backup SIGTERM rehearsal also passed: previously runn
 
 ## 23 October 2026 — placement integrity work
 
-The expanded local suite passed 39 integration tests in 15.642 seconds after adding dated overlap/capacity and native care/correction audit scenarios. The capacity fixture now uses the actual return date for the next placement; the old backdated fixture correctly conflicts. HTTP/browser and PostgreSQL concurrency checks have been added and remain under verification. The official local Chromium download returned a non-ZIP payload; no local browser pass is claimed for this revision. The previous alpha.1 evidence above remains historical and is not substituted for these new checks.
+The expanded local suite passed 39 integration tests in 15.642 seconds after adding dated overlap/capacity and native care/correction audit scenarios. The capacity fixture now uses the actual return date for the next placement; the old backdated fixture correctly conflicts. HTTP/browser and PostgreSQL concurrency checks were added; their later CI results are recorded below. The official local Chromium download returned a non-ZIP payload; no local browser pass is claimed for this revision. The previous alpha.1 evidence above remains historical and is not substituted for these new checks.
 
 The selected 391 native domain tests also passed locally (237.835 seconds). CI run [40037223011](https://github.com/billyke2000s/Tailwag/actions/runs/40037223011) stopped at its locked Python audit: Brotli 1.2.0 was affected by PYSEC-2026-4322 / GHSA-9v8h-qqgm-4m35. Later checks and release publication were skipped. The pin was upgraded to 1.2.1, matching the [upstream security release](https://github.com/google/brotli/releases/tag/v1.2.1), checked 23 October 2026. No vulnerability suppression was introduced.
 
-After upgrading Brotli, the local locked-requirements audit reported no known vulnerabilities, `pip check` reported no broken requirements, and all 39 integration tests passed again (15.266 seconds). This is an advisory scan of the locked Python requirements, not a complete security assessment. New browser/PostgreSQL/deployment evidence remains pending CI.
+After upgrading Brotli, the local locked-requirements audit reported no known vulnerabilities, `pip check` reported no broken requirements, and all 39 integration tests passed again (15.266 seconds). This is an advisory scan of the locked Python requirements, not a complete security assessment. The later CI results below supersede the earlier pending state.
+
+
+### Published alpha.2 evidence
+
+[Push/release run 40038283533](https://github.com/billyke2000s/Tailwag/actions/runs/40038283533) passed at `699a0f21ccb7964a19354672c40b5519ba094ca4`. [PR run 40038288948](https://github.com/billyke2000s/Tailwag/actions/runs/40038288948) also passed. PR #17 merged that implementation into main.
+
+| Check | Actual result in the push run |
+|---|---|
+| Integration | 39 passed, 28.832 seconds |
+| Selected native domain suite | 391 passed, 240.609 seconds; isolated fixtures, email stubbed |
+| Advisory scans | Locked Python requirements: no known vulnerabilities; browser inventory audit passed |
+| Staff/browser | 12 public route/viewport checks, enquiry, keyboard skip, TOTP, 3 staff sizes, 41 selected role boundaries, document save/sanitisation, password/privilege session revocation and foreign-origin rejection passed |
+| Placement concurrency/history | Two simultaneous staff foster requests for one slot: one success and one HTTP 400; ignored adoption fields rejected without changing the existing foster; explicit return freed capacity with history retained |
+| PostgreSQL | Fresh install/migration, distinct submission IDs, one-slot concurrent foster guard and dump/restore passed; restored movement retained |
+| Backup wrapper | Synthetic success/failure/state/permissions/checksum checks passed; no live backup claim |
+| Server/package | Image build, fresh production-settings startup with no seed animals, Compose/Caddy and setup from the extracted source archive passed |
+| External operations | No live deployment, SMTP delivery, payment, scanner or encrypted off-host restore performed |
+
+The workflow published alpha.2 as a prerelease with the source archive and SHA256SUMS.txt. GitHub reports source asset SHA-256 `a0cd3aff85e24d6aa416288340cf3e4de9cd7a4e0172e47b399d63c905e8de59`. The immutable tag targets the verified implementation; subsequent documentation updates leave that checkpoint intact. The independent prototype checks passed too; its APK release was not replaced.
+
+This closes the selected dated-placement verification, not the complete launch matrix. Native import/bulk paths, intraday premises/compatibility, interrupted multi-statement operations, full object/role isolation and organisational acceptance remain open in LAUNCH-READINESS.md.

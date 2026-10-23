@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — 0.1.0-alpha.2 placement integrity
+## care-v0.1.0-alpha.2 — 23 October 2026 · evaluation prerelease
 
 - Reject overlapping dated movements and ignored-field precheck bypasses before native mutations.
 - Check future foster occupancy and peak concurrent capacity; retain valid history and explicit returns.
