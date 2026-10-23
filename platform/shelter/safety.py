@@ -15,52 +15,7 @@ def next_collation(dbo):
 asm3.onlineform.get_collationid = next_collation
 
 
-def check_placement(dbo, post):
-    kind = post.integer("type")
-    if kind <= 0 or post.date("returndate") is not None:
-        return
-    if dbo.query_int(
-        "SELECT COUNT(*) FROM adoption WHERE AnimalID = ? AND MovementType > 0 AND MovementDate IS NOT NULL AND ReturnDate IS NULL AND ID <> ?",
-        [post.integer("animal"), post.integer("movementid")],
-    ):
-        raise asm3.utils.ASMValidationError(
-            "Return the existing placement explicitly before creating another movement"
-        )
-    if kind not in (1, 2):
-        return
-    animal = asm3.animal.get_animal(dbo, post.integer("animal"))
-    if not animal or animal.get("DECEASEDDATE"):
-        raise asm3.utils.ASMValidationError("A living animal record is required")
-    if kind == 1 and any(
-        asm3.utils.cint(animal.get(k))
-        for k in (
-            "ISNOTAVAILABLEFORADOPTION",
-            "ISHOLD",
-            "ISQUARANTINE",
-            "HASPERMANENTFOSTER",
-        )
-    ):
-        raise asm3.utils.ASMValidationError("This animal is not cleared for adoption")
-    person = dbo.first_row(
-        dbo.query(
-            "SELECT ID, IDCheck, FosterCapacity, IsFosterer FROM owner WHERE ID = ?",
-            [post.integer("person")],
-        )
-    )
-    if not person or not person["IDCHECK"]:
-        raise asm3.utils.ASMValidationError(
-            "A recorded household assessment is required before placement"
-        )
-    if kind == 2:
-        capacity = asm3.utils.cint(person["FOSTERCAPACITY"])
-        count = dbo.query_int(
-            "SELECT COUNT(*) FROM adoption WHERE OwnerID = ? AND MovementType = 2 AND MovementDate IS NOT NULL AND ReturnDate IS NULL AND ID <> ?",
-            [person["ID"], post.integer("movementid")],
-        )
-        if not person["ISFOSTERER"] or capacity <= 0 or count >= capacity:
-            raise asm3.utils.ASMValidationError(
-                "Approved foster capacity is unavailable"
-            )
+from .placements import check_placement
 
 
 original_movement = asm3.movement.validate_movement_form_data
@@ -94,7 +49,7 @@ def adopt(dbo, username, post, creating=None, create_payments=True, adopt_bonded
     ):
         raise asm3.utils.ASMValidationError("This animal is not cleared for adoption")
     candidate = dict(post.data)
-    candidate["type"] = "1"
+    candidate.update({"type": "1", "returndate": "", "movementid": ""})
     check_placement(dbo, asm3.utils.PostedData(candidate, dbo.locale))
     return original_adopt(
         dbo,
@@ -113,7 +68,9 @@ original_foster = asm3.movement.insert_foster_from_form
 @wraps(original_foster)
 def foster(dbo, username, post):
     candidate = dict(post.data)
-    candidate.update({"type": "2", "movementdate": post["fosterdate"]})
+    candidate.update(
+        {"type": "2", "movementdate": post["fosterdate"], "movementid": ""}
+    )
     check_placement(dbo, asm3.utils.PostedData(candidate, dbo.locale))
     if dbo.query_int(
         "SELECT COUNT(*) FROM adoption WHERE AnimalID = ? AND MovementDate IS NOT NULL AND ReturnDate IS NULL",
@@ -132,7 +89,14 @@ original_transfer = asm3.movement.insert_transfer_from_form
 @wraps(original_transfer)
 def transfer(dbo, username, post):
     candidate = dict(post.data)
-    candidate.update({"type": "3", "movementdate": post["transferdate"]})
+    candidate.update(
+        {
+            "type": "3",
+            "movementdate": post["transferdate"],
+            "returndate": "",
+            "movementid": "",
+        }
+    )
     check_placement(dbo, asm3.utils.PostedData(candidate, dbo.locale))
     return original_transfer(dbo, username, post)
 

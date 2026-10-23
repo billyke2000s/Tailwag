@@ -41,3 +41,11 @@ A separate isolated synthetic care rehearsal passed linked one-off scheduling, a
 The workflow published [care-v0.1.0-alpha.1](https://github.com/billyke2000s/Tailwag/releases/tag/care-v0.1.0-alpha.1) as a prerelease with the operational source archive and SHA256SUMS.txt. The release/tag remains pinned to its verified source revision. Subsequent documentation updates do not change that immutable checkpoint. This is an evaluation release, not an operational deployment or a completed launch approval.
 
 A separate local synthetic backup SIGTERM rehearsal also passed: previously running writers resumed and no completed dump was exposed. It does not replace an encrypted off-host restore drill.
+
+## 23 October 2026 — placement integrity work
+
+The expanded local suite passed 39 integration tests in 15.642 seconds after adding dated overlap/capacity and native care/correction audit scenarios. The capacity fixture now uses the actual return date for the next placement; the old backdated fixture correctly conflicts. HTTP/browser and PostgreSQL concurrency checks have been added and remain under verification. The official local Chromium download returned a non-ZIP payload; no local browser pass is claimed for this revision. The previous alpha.1 evidence above remains historical and is not substituted for these new checks.
+
+The selected 391 native domain tests also passed locally (237.835 seconds). CI run [40037223011](https://github.com/billyke2000s/Tailwag/actions/runs/40037223011) stopped at its locked Python audit: Brotli 1.2.0 was affected by PYSEC-2026-4322 / GHSA-9v8h-qqgm-4m35. Later checks and release publication were skipped. The pin was upgraded to 1.2.1, matching the [upstream security release](https://github.com/google/brotli/releases/tag/v1.2.1), checked 23 October 2026. No vulnerability suppression was introduced.
+
+After upgrading Brotli, the local locked-requirements audit reported no known vulnerabilities, `pip check` reported no broken requirements, and all 39 integration tests passed again (15.266 seconds). This is an advisory scan of the locked Python requirements, not a complete security assessment. New browser/PostgreSQL/deployment evidence remains pending CI.

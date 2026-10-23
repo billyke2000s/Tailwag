@@ -105,12 +105,12 @@ class PlatformTests(TestCase):
         )
         return pid
 
-    def foster(self, aid, pid):
+    def foster(self, aid, pid, date="01/10/2026"):
         return asm3.movement.insert_foster_from_form(
             self.dbo,
             "test",
             asm3.utils.PostedData(
-                {"animal": str(aid), "person": str(pid), "fosterdate": "01/10/2026"},
+                {"animal": str(aid), "person": str(pid), "fosterdate": date},
                 "en_GB",
             ),
         )
@@ -356,7 +356,7 @@ class PlatformTests(TestCase):
             0,
         )
         asm3.movement.return_movement(self.dbo, mid, "test", first, self.dbo.today())
-        self.foster(second, pid)
+        self.foster(second, pid, asm3.i18n.python2display("en_GB", self.dbo.today()))
         self.assertEqual(self.dbo.query_int("SELECT COUNT(*) FROM animal"), 2)
 
     def test_unassessed_household(self):
@@ -519,3 +519,194 @@ class PlatformTests(TestCase):
         )
         with self.assertRaises(asm3.utils.ASMPermissionError):
             asm3.reports.check_view_permission(session, report)
+
+    def movement(self, aid, pid, start, end="", **extra):
+        data = {
+            "animal": str(aid),
+            "person": str(pid),
+            "type": "2",
+            "movementdate": start,
+            "returndate": end,
+            **extra,
+        }
+        return asm3.movement.insert_movement_from_form(
+            self.dbo, "synthetic-placement", asm3.utils.PostedData(data, "en_GB")
+        )
+
+    def test_returned_interval_cannot_hide_nested_or_identical_placement(self):
+        aid, pid = self.animal(), self.person()
+        self.movement(aid, pid, "01/11/2026", "10/11/2026")
+        for start, end in [("03/11/2026", "05/11/2026"), ("01/11/2026", "10/11/2026")]:
+            with self.assertRaises(asm3.utils.ASMValidationError):
+                self.movement(aid, pid, start, end)
+        self.assertEqual(self.dbo.query_int("SELECT COUNT(*) FROM adoption"), 1)
+
+    def test_returned_foster_still_needs_assessment(self):
+        with self.assertRaises(asm3.utils.ASMValidationError):
+            self.movement(
+                self.animal(), self.person(assessed=False), "01/10/2026", "05/10/2026"
+            )
+        self.assertEqual(self.dbo.query_int("SELECT COUNT(*) FROM adoption"), 0)
+
+    def test_future_return_reserves_foster_capacity(self):
+        pid = self.person()
+        self.movement(self.animal(), pid, "01/11/2026", "10/11/2026")
+        with self.assertRaises(asm3.utils.ASMValidationError):
+            self.movement(self.animal(), pid, "05/11/2026", "08/11/2026")
+        self.assertEqual(self.dbo.query_int("SELECT COUNT(*) FROM adoption"), 1)
+
+    def test_capacity_counts_simultaneous_stays_and_releases_on_return_date(self):
+        pid = self.person(capacity=2)
+        self.movement(self.animal(), pid, "01/11/2026", "05/11/2026")
+        self.movement(self.animal(), pid, "05/11/2026", "10/11/2026")
+        self.movement(self.animal(), pid, "01/11/2026", "10/11/2026")
+        with self.assertRaises(asm3.utils.ASMValidationError):
+            self.movement(self.animal(), pid, "02/11/2026", "09/11/2026")
+        self.assertEqual(self.dbo.query_int("SELECT COUNT(*) FROM adoption"), 3)
+
+    def test_historical_record_preserves_current_foster(self):
+        aid, pid = self.animal(), self.person()
+        mid = self.foster(aid, pid)
+        self.movement(aid, pid, "01/09/2026", "05/09/2026")
+        self.assertIsNone(
+            self.dbo.query_date("SELECT ReturnDate FROM adoption WHERE ID = ?", [mid])
+        )
+        self.assertEqual(self.dbo.query_int("SELECT COUNT(*) FROM adoption"), 2)
+
+    def test_return_edit_cannot_extend_into_another_placement(self):
+        aid, pid = self.animal(), self.person()
+        first = self.movement(aid, pid, "01/11/2026", "05/11/2026")
+        self.movement(aid, pid, "05/11/2026", "10/11/2026")
+        previous = self.dbo.query_date(
+            "SELECT ReturnDate FROM adoption WHERE ID = ?", [first]
+        )
+        with self.assertRaises(asm3.utils.ASMValidationError):
+            asm3.movement.update_movement_from_form(
+                self.dbo,
+                "synthetic-reviewer",
+                asm3.utils.PostedData(
+                    {
+                        "movementid": str(first),
+                        "animal": str(aid),
+                        "person": str(pid),
+                        "type": "2",
+                        "movementdate": "01/11/2026",
+                        "returndate": "07/11/2026",
+                    },
+                    "en_GB",
+                ),
+            )
+        self.assertEqual(
+            self.dbo.query_date(
+                "SELECT ReturnDate FROM adoption WHERE ID = ?", [first]
+            ),
+            previous,
+        )
+
+    def test_ignored_workflow_fields_cannot_bypass_pre_mutation_checks(self):
+        aid, pid = self.animal(), self.person()
+        mid = self.foster(aid, pid)
+        for fn, datefield in [
+            (asm3.movement.insert_adoption_from_form, "movementdate"),
+            (asm3.movement.insert_transfer_from_form, "transferdate"),
+        ]:
+            with self.assertRaises(asm3.utils.ASMValidationError):
+                fn(
+                    self.dbo,
+                    "synthetic-placement",
+                    asm3.utils.PostedData(
+                        {
+                            "animal": str(aid),
+                            "person": str(pid),
+                            datefield: "02/10/2026",
+                            "returndate": "03/10/2026",
+                            "movementid": str(mid),
+                        },
+                        "en_GB",
+                    ),
+                )
+            self.assertIsNone(
+                self.dbo.query_date(
+                    "SELECT ReturnDate FROM adoption WHERE ID = ?", [mid]
+                )
+            )
+        self.assertEqual(self.dbo.query_int("SELECT COUNT(*) FROM adoption"), 1)
+
+    def test_invalid_movement_dates_are_not_silently_replaced(self):
+        aid, pid = self.animal(), self.person()
+        for start, end in [
+            ("invalid", ""),
+            ("01/11/2026", "invalid"),
+            ("05/11/2026", "01/11/2026"),
+        ]:
+            with self.assertRaises(asm3.utils.ASMValidationError):
+                self.movement(aid, pid, start, end)
+        self.assertEqual(self.dbo.query_int("SELECT COUNT(*) FROM adoption"), 0)
+
+    def test_care_schedule_administration_and_correction_audit(self):
+        import asm3.medical
+
+        aid = self.animal()
+        regimen = asm3.medical.insert_regimen_from_form(
+            self.dbo,
+            "synthetic-clinician",
+            asm3.utils.PostedData(
+                {
+                    "animal": str(aid),
+                    "startdate": asm3.i18n.python2display("en_GB", self.dbo.today()),
+                    "treatmentname": "Synthetic fixture only - not a clinical instruction",
+                    "dosage": "Synthetic text only; no dose",
+                    "singlemulti": "0",
+                    "treatmentrule": "0",
+                    "status": "0",
+                },
+                "en_GB",
+            ),
+        )
+        treatment = self.dbo.query_int(
+            "SELECT ID FROM animalmedicaltreatment WHERE AnimalMedicalID = ?", [regimen]
+        )
+        self.assertGreater(treatment, 0)
+        asm3.medical.update_treatment_given(
+            self.dbo,
+            "synthetic-carer",
+            treatment,
+            self.dbo.now(),
+            "Synthetic carer",
+            0,
+            "Synthetic administration",
+        )
+        asm3.medical.update_treatment_given(
+            self.dbo,
+            "synthetic-reviewer",
+            treatment,
+            self.dbo.now(),
+            "Synthetic carer",
+            0,
+            "Synthetic correction reason",
+        )
+        self.assertEqual(
+            self.dbo.query_int(
+                "SELECT TreatmentsGiven FROM animalmedical WHERE ID = ?", [regimen]
+            ),
+            1,
+        )
+        self.assertEqual(
+            self.dbo.query_int(
+                "SELECT COUNT(*) FROM animalmedicaltreatment WHERE AnimalMedicalID = ?",
+                [regimen],
+            ),
+            1,
+        )
+        rows = self.dbo.query(
+            "SELECT * FROM audittrail WHERE TableName = ? AND LinkID = ?",
+            ["animalmedicaltreatment", treatment],
+        )
+        self.assertTrue(any(r.USERNAME == "synthetic-carer" for r in rows))
+        self.assertTrue(
+            any(
+                r.USERNAME == "synthetic-reviewer"
+                and "Synthetic correction reason" in str(r)
+                for r in rows
+            )
+        )

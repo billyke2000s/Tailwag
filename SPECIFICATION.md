@@ -49,7 +49,7 @@ This is a domain specification, not a claim that one native enum enforces every 
 | AUTH-1 | Staff | Individual account, forced TOTP, server permissions, recovery audit, origin rejection, session expiry. Some implementation verified; complete role/object matrix open. |
 | INT-1 | Intake | Identity/source/ownership documents; duplicate search; species care needs; quarantine and placement review; history retained. Native workflow adopted; end-to-end acceptance open. |
 | MED-1 | Care | Authorised instructions, actual administration and missed-dose reasons, vaccine/test history, handover and urgent escalation; no generated doses. Native selected tests pass; clinical SOP/end-to-end review open. |
-| MOVE-1 | Foster/adoption | Assessed household, approved capacity, no conflicting active placement, explicit return, unavailable/sanctuary adoption blocked, history retained. Selected wrappers tested; bulk/import/concurrent interruption paths open. |
+| MOVE-1 | Foster/adoption | Assessed household, approved capacity, no conflicting active placement, explicit return, unavailable/sanctuary adoption blocked, history retained. Dated overlap and simultaneous foster-capacity guards implemented; selected paths tested; bulk/import and interrupted-write paths open. |
 | OPS-1 | Tasks/stock/people | Assigned responsibilities, scheduling/rota, training, inventory and reporting use native records. Organisation configuration and user acceptance open. |
 | DATA-1 | Records/rights | Private documents and exports, audit, corrections, archive, retention/legal hold, approved deletion and recovery drill. Native tools adopted; actual policy and full drill open. |
 | RUN-1 | Server | Fresh PG install/migrations, TLS, secret management, jobs/monitoring, backup/restore and rollback. Configuration prepared; evidence tracked separately. |
@@ -61,3 +61,5 @@ Home/about, animals/detail, adoption, fostering, volunteering/help, visiting/con
 ## Launch requirements
 
 Real organisation contact/policies, council applicability, capacities, clinical SOPs, approved access matrix, hosting and backup ownership must be recorded. Operational success requires evidence across all acceptance criteria, including failure/concurrent paths and representative assistive-technology use. Software does not replace welfare professionals, inspections or organisational obligations.
+
+Placement dates follow the canonical day-based model: movement includes its start date and releases occupancy on its explicit return date. Future returns still occupy capacity until that date. Same-day movements do not consume overnight capacity; intraday accommodation requires separate acceptance. Foster occupancy uses peak concurrency across the proposed interval. No existing history is automatically rewritten. Dedicated workflow prechecks use only fields the native workflow consumes.
