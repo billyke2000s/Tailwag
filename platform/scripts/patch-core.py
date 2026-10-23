@@ -17,6 +17,29 @@ def replace(file, old, new):
 
 
 replace(
+    "src/asm3/utils.py",
+    '''class ASMValidationError(web.HTTPError):
+    """
+    Custom error thrown by data modules when validation fails
+    """
+    msg = ""
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
+        status = '500 Internal Server Error'
+'''.rstrip(),
+    '''class ASMValidationError(web.HTTPError):
+    """
+    Custom error thrown by data modules when validation fails
+    """
+    msg = ""
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
+        status = '400 Bad Request'
+'''.rstrip(),
+)
+
+
+replace(
     "src/asm3/users.py",
     'asm3.al.error("database:%s username:%s password:%s failed authentication from %s [%s]" % (database, username, password, remoteip, useragent), "users.web_login", dbo)',
     'asm3.al.error("authentication_failed", "users.web_login", dbo)',
