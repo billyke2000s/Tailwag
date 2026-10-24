@@ -1,6 +1,6 @@
 # Testing
 
-Install DEVELOPMENT.md prerequisites. Tests use generated synthetic data and isolated databases. Never set test database variables to a live system.
+Install DEVELOPMENT.md prerequisites, including Poppler (`pdftotext`, `pdfinfo`, `pdfimages`) for actual export verification. Tests use generated synthetic data and isolated databases. Never set test database variables to a live system.
 
 ```sh
 .venv/bin/python platform/scripts/test.py
@@ -14,7 +14,7 @@ node platform/scripts/browser-test.mjs
 .venv/bin/python -m pip_audit -r platform/requirements.txt
 ```
 
-The 55 integration tests cover real native incoming forms, repeated submission tokens, CSRF, invalid input, abuse limits, uncertain writes, private publication flags, images, sanctuary adoption guards, assessed foster households, capacity, explicit returns, role templates, safe logs, password policy and legacy hash upgrades, privilege/session stamps, sensitive-report permissions, zero-prefixed TOTP and SQLite restore. The selected 391 native domain tests reset the database per case; outbound email is stubbed. They do not exercise every native feature or prove mail delivery.
+The 68 integration tests cover real native incoming forms, repeated submission tokens, CSRF, invalid input, abuse limits, uncertain writes, private publication flags, images, sanctuary adoption guards, assessed foster households, capacity, explicit returns, role templates, safe logs, password policy and legacy hash upgrades, privilege/session stamps, sensitive-report permissions, zero-prefixed TOTP and SQLite restore. The selected 391 native domain tests reset the database per case; outbound email is stubbed. They do not exercise every native feature or prove mail delivery.
 
 Browser automation creates its own databases, enrols TOTP using a generated secret without printing it, verifies a real enquiry, keyboard skip navigation and representative desktop/tablet/phone routes, verifies 41 selected route/write boundaries across five roles, checks actual document save/reload and editor sanitisation, password-change and role-change session revocation, blocks legacy email recovery, runs reviewed daily tasks, then removes runtime secrets. Screenshots contain synthetic data only. `CHROMIUM_PATH` optionally selects an installed browser. Use Playwright's bundled browser in CI.
 
@@ -29,3 +29,5 @@ The backup-wrapper test stubs Docker to exercise successful dumps, dump failure,
 Dated-placement scenarios include nested/equal intervals, future foster occupancy, peak simultaneous capacity, return-date reuse, assessment of closed stays, historical continuity and ignored workflow fields. The original capacity fixture was corrected to place the next animal on the actual return date; backdating it into the previous stay now correctly fails. Browser checks submit two simultaneous staff foster requests for one slot, verify exactly one succeeds, reject a forged adoption request without changing that foster, and verify explicit return releases capacity with history retained. PostgreSQL CI repeats simultaneous placement under the actual advisory lock. These cases do not establish universal import/bulk or interrupted-write atomicity.
 
 Care completion coverage adds repeat/stock protection across treatments, vaccinations and tests, atomic rollback after mid-batch and stock-write failures, invalid selections/dates/stock, reason/snapshot checks, stale correction rejection and preserved clearing history. Browser and PostgreSQL scripts also exercise competing care requests. These do not establish safety of every inherited edit/import or clinical SOP.
+
+Document checks cover real PDF text/geometry/tags/raster output; rejected file, CSS, SVG, relative, attachment and network resources; no request received by a local HTTP fixture; worker secret omission and bounded input/error behaviour. Browser CI downloads through the actual editor PDF control and exercises a sandboxed print-preview response. The production-settings image test exports a synthetic PDF and extracts its text, verifying fonts/worker dependencies. These scripts are not evidence of a real signed agreement or complete document-route audit.

@@ -41,6 +41,7 @@ jobs:
           .venv/bin/pip install -r platform/requirements.txt
           npm ci
           npx playwright install --with-deps chromium
+          sudo apt-get install -y poppler-utils
       - name: Audit locked Python packages
         run: |
           .venv/bin/pip install pip-audit==2.10.1
@@ -90,14 +91,14 @@ jobs:
         if: github.event_name == 'push'
         run: |
           mkdir release-care
-          tar --exclude='platform/runtime' --exclude='platform/staticfiles' --exclude='__pycache__' --exclude='*.pyc' --exclude='platform/vendor/asm/scripts/schema/schema.db' --exclude='.env' --exclude='.git' -czf release-care/TailWag-Care-0.1.0-alpha.3-source.tar.gz platform *.md package.json package-lock.json docs .github/workflows/platform.yml
+          tar --exclude='platform/runtime' --exclude='platform/staticfiles' --exclude='__pycache__' --exclude='*.pyc' --exclude='platform/vendor/asm/scripts/schema/schema.db' --exclude='.env' --exclude='.git' -czf release-care/TailWag-Care-0.1.0-alpha.4-source.tar.gz platform *.md package.json package-lock.json docs .github/workflows/platform.yml
           cd release-care
           sha256sum *.tar.gz > SHA256SUMS.txt
       - name: Verify extracted candidate setup
         if: github.event_name == 'push'
         run: |
           SOURCE_TEST=$(mktemp -d)
-          tar -xzf release-care/TailWag-Care-0.1.0-alpha.3-source.tar.gz -C "$SOURCE_TEST"
+          tar -xzf release-care/TailWag-Care-0.1.0-alpha.4-source.tar.gz -C "$SOURCE_TEST"
           .venv/bin/python "$SOURCE_TEST/platform/scripts/dev.py" --prepare
           .venv/bin/python "$SOURCE_TEST/platform/scripts/dev.py" --seed
           test -f "$SOURCE_TEST/platform/runtime/core.sqlite3"
@@ -109,7 +110,7 @@ jobs:
   candidate-release:
     name: Publish operational evaluation candidate
     needs: platform
-    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/care-recording'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/document-boundary'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -124,9 +125,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          TAG=care-v0.1.0-alpha.3
+          TAG=care-v0.1.0-alpha.4
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo 'Candidate already published; preserving its revision and assets.'
             exit 0
           fi
-          gh release create "$TAG" release-care/* --target "$GITHUB_SHA" --prerelease --title 'TailWag Care 0.1.0-alpha.3 · Evaluation candidate' --notes-file docs/releases/care-v0.1.0-alpha.3.md
+          gh release create "$TAG" release-care/* --target "$GITHUB_SHA" --prerelease --title 'TailWag Care 0.1.0-alpha.4 · Evaluation candidate' --notes-file docs/releases/care-v0.1.0-alpha.4.md

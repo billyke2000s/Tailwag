@@ -12,3 +12,9 @@ def logmsg(level, msg, location, dbo):
 
 asm3.al.logmsg = logmsg
 from . import safety, accounts
+
+# Never invoke configurable shell renderers or unrestricted resource fetching.
+from .documents import html_to_pdf
+import asm3.utils
+
+asm3.utils.html_to_pdf = html_to_pdf
