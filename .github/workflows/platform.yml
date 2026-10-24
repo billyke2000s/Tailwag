@@ -80,7 +80,7 @@ jobs:
           cp .env.example .env
           PGDATABASE=synthetic_test PGUSER=synthetic_test PGPASSWORD=synthetic-ci-only PUBLIC_DOMAIN=care.example.invalid STAFF_DOMAIN=team.example.invalid docker compose config --quiet
           docker run --rm -e PUBLIC_DOMAIN=care.example.invalid -e STAFF_DOMAIN=team.example.invalid -v "$PWD/Caddyfile:/etc/caddy/Caddyfile:ro" caddy:2 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: synthetic-platform-screens
@@ -101,7 +101,7 @@ jobs:
           .venv/bin/python "$SOURCE_TEST/platform/scripts/dev.py" --prepare
           .venv/bin/python "$SOURCE_TEST/platform/scripts/dev.py" --seed
           test -f "$SOURCE_TEST/platform/runtime/core.sqlite3"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: github.event_name == 'push'
         with:
           name: operational-candidate-source
