@@ -74,6 +74,7 @@ try {
     "-c",
     "from shelter.core import database; import asm3.utils; d=database(); d.insert('templatedocument',{'ID':900000,'Name':'synthetic-browser.html','Path':'/','ShowAt':'everywhere','Content':asm3.utils.base64encode('<p>Synthetic agreement fixture</p>')},generateID=False)",
   ]);
+  run(["-c", "from shelter.core import database; import asm3.users,asm3.utils,os; d=database(); r=d.query_int(\"SELECT ID FROM role WHERE RoleName = 'Veterinary team'\"); u=asm3.users.insert_user_from_form(d,'browser-test',asm3.utils.PostedData({'username':'synthetic-restricted','realname':'Synthetic restricted test','password':os.environ['ADMIN_PASSWORD'],'roles':str(r),'locationfilter':'999999'},'en_GB')); d.update('users',u,{'EnableTOTP':1,'OTPSecret':'JBSWY3DPEHPK3PXP'})"]);
   const activeReportID = Number(
     run([
       "-c",
@@ -292,6 +293,162 @@ try {
   );
   if (oldAsset.status() !== 404)
     throw Error("Vulnerable legacy asset is still served");
+  const careFixture = JSON.parse(
+    run([
+      "-c",
+      `
+from shelter.core import database
+import asm3.medical, asm3.stock, asm3.utils, asm3.i18n, json
+from shelter.care import record_care
+assert __import__('os').environ['DEMO_DATA'] == 'true'
+d = database(); date = asm3.i18n.python2display('en_GB', d.today())
+ids = []
+for i in range(2):
+    regimen = asm3.medical.insert_regimen_from_form(d, 'browser-test', asm3.utils.PostedData({'animal':'1','startdate':date,'treatmentname':'Synthetic browser care '+str(i),'dosage':'Synthetic text only; no dose','singlemulti':'0','treatmentrule':'0','status':'0'},'en_GB'))
+    ids.append(d.query_int('SELECT ID FROM animalmedicaltreatment WHERE AnimalMedicalID = ?', [regimen]))
+stock = asm3.stock.insert_stocklevel_from_form(d, asm3.utils.PostedData({'name':'Synthetic browser supply','unitname':'synthetic units','balance':'10','total':'10','usagedate':date,'usagetype':'1','location':'1'},'en_GB'), 'browser-test')
+print(json.dumps({'ids':ids,'stock':stock,'date':date}))
+`,
+    ]),
+  );
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const selectCare = async (id) => {
+    await page.goto("http://localhost:5000/animal_medical?id=1");
+    await page.waitForFunction(
+      (id) =>
+        typeof controller !== "undefined" &&
+        controller.rows?.some((row) => row.TREATMENTID === id),
+      id,
+    );
+    const row = await page.evaluate(
+      (id) => controller.rows.find((row) => row.TREATMENTID === id),
+      id,
+    );
+    await page
+      .locator('input[type="checkbox"][data-id="' + row.COMPOSITEID + '"]')
+      .check();
+    return row;
+  };
+  const originalCare = await selectCare(careFixture.ids[0]);
+  await page.locator("#button-given").click();
+  const careDialog = page.getByRole("dialog", {
+    name: "Save care record",
+    exact: true,
+  });
+  await careDialog.waitFor();
+  await page.locator("#item").selectOption(String(careFixture.stock));
+  await page.locator("#quantity").fill("2");
+  await page.locator("#usagetype").selectOption("1");
+  await page
+    .locator("#treatmentcomments")
+    .fill("Synthetic browser administration");
+  const saveCare = async () => {
+    const response = page.waitForResponse(
+      (r) => r.url().endsWith("/medical") && r.request().method() === "POST",
+    );
+    await careDialog
+      .getByRole("button", { name: "Save care record", exact: true })
+      .click();
+    if ((await response).status() !== 200)
+      throw Error("Care dialog save failed");
+    await careDialog.waitFor({ state: "hidden" });
+  };
+  await saveCare();
+  const clinicalPost = (form) =>
+    page.request.post("http://localhost:5000/medical", {
+      headers: { Origin: "http://localhost:5000" },
+      form,
+    });
+  const repeated = await Promise.all(
+    [0, 1].map(() =>
+      clinicalPost({
+        mode: "given",
+        ids: String(careFixture.ids[1]),
+        newdate: careFixture.date,
+        item: String(careFixture.stock),
+        quantity: "2",
+        usagetype: "1",
+        givenby: "Synthetic browser carer",
+      }),
+    ),
+  );
+  if (
+    repeated
+      .map((r) => r.status())
+      .sort()
+      .join(",") !== "200,400"
+  )
+    throw Error("Concurrent care completion was not guarded");
+  const staleCare = await clinicalPost({
+    mode: "given",
+    ids: String(careFixture.ids[0]),
+    newdate: careFixture.date,
+    item: "-1",
+    recordaction: "correct",
+    correctionreason: "Synthetic stale correction",
+    recordversions: JSON.stringify({
+      [careFixture.ids[0]]: originalCare.CAREVERSION,
+    }),
+  });
+  if (staleCare.status() !== 400)
+    throw Error("Stale care correction was accepted");
+  await selectCare(careFixture.ids[0]);
+  await page.locator("#button-given").click();
+  await page.locator("#recordaction").selectOption("correct");
+  await page
+    .getByLabel("Correction reason", { exact: true })
+    .fill("Synthetic browser correction reason");
+  await page
+    .locator("#treatmentcomments")
+    .fill("Synthetic corrected browser note");
+  if (await careDialog.locator(".tagstock:visible").count())
+    throw Error("Correction exposes stock deduction controls");
+  for (const [label, width, height] of [
+    ["desktop", 1440, 1000],
+    ["tablet", 820, 1180],
+    ["phone", 390, 844],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await page.waitForTimeout(100);
+    if (
+      await careDialog.evaluate(
+        (element) => element.scrollWidth > element.clientWidth + 1,
+      )
+    )
+      throw Error("Care dialog overflow: " + label);
+    await page.screenshot({
+      path: `docs/assets/platform/care-correction-${label}.png`,
+      fullPage: true,
+    });
+  }
+  await saveCare();
+  await selectCare(careFixture.ids[0]);
+  await page.locator("#button-undo").click();
+  await careDialog.waitFor();
+  if ((await page.locator("#recordaction").inputValue()) !== "undo")
+    throw Error("Explicit care clear action missing");
+  await page
+    .getByLabel("Correction reason", { exact: true })
+    .fill("Synthetic erroneous completion correction");
+  await saveCare();
+  run([
+    "-c",
+    `from shelter.core import database; d=database(); assert d.query_date('SELECT DateGiven FROM animalmedicaltreatment WHERE ID = ?',[${careFixture.ids[0]}]) is None; assert 'Synthetic erroneous completion correction' in d.query_string('SELECT Comments FROM animalmedicaltreatment WHERE ID = ?',[${careFixture.ids[0]}]); assert d.query_float('SELECT Balance FROM stocklevel WHERE ID = ?',[${careFixture.stock}])==6; assert d.query_int('SELECT COUNT(*) FROM stockusage WHERE StockLevelID = ?',[${careFixture.stock}])==3; assert d.query_int('SELECT COUNT(*) FROM audittrail WHERE TableName = ? AND LinkID = ? AND UserName = ?',['animalmedicaltreatment',${careFixture.ids[0]},'care-admin'])>=3`,
+  ]);
+  const restrictedContext = await browser.newContext();
+  await restrictedContext.request.get("http://localhost:5000/login");
+  const restrictedLogin = await restrictedContext.request.post("http://localhost:5000/login", {
+    headers: { Origin: "http://localhost:5000" },
+    form: { username: "synthetic-restricted", password, onetimepass: otp("JBSWY3DPEHPK3PXP"), database: "" },
+  });
+  if (restrictedLogin.status() !== 200) throw Error("Restricted care account sign-in failed");
+  const restrictedGet = await restrictedContext.request.get("http://localhost:5000/animal_medical?id=1");
+  const restrictedWrite = await restrictedContext.request.post("http://localhost:5000/medical", {
+    headers: { Origin: "http://localhost:5000" },
+    form: { mode: "given", ids: String(careFixture.ids[0]), newdate: careFixture.date, item: "-1" },
+  });
+  if (restrictedGet.status() !== 403 || restrictedWrite.status() !== 403) throw Error("Clinical animal object boundary failed");
+  await restrictedContext.close();
   const fosterPerson = Number(
     run([
       "-c",
@@ -477,6 +634,11 @@ try {
       browserAssetVersions: versions,
       reviewedDailyJobs: "passed",
       concurrentFosterCapacity: "passed",
+      careCompletionAndCorrection: "passed",
+      concurrentCareStock: "passed",
+      staleCareCorrection: "blocked",
+      careDialogViewports: 3,
+      clinicalObjectBoundary: "passed",
       explicitReturnHistory: "passed",
       ignoredWorkflowFields: "blocked",
       foreignOrigin: "blocked",

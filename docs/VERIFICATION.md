@@ -74,3 +74,8 @@ After upgrading Brotli, the local locked-requirements audit reported no known vu
 The workflow published alpha.2 as a prerelease with the source archive and SHA256SUMS.txt. GitHub reports source asset SHA-256 `a0cd3aff85e24d6aa416288340cf3e4de9cd7a4e0172e47b399d63c905e8de59`. The immutable tag targets the verified implementation; subsequent documentation updates leave that checkpoint intact. The independent prototype checks passed too; its APK release was not replaced.
 
 This closes the selected dated-placement verification, not the complete launch matrix. Native import/bulk paths, intraday premises/compatibility, interrupted multi-statement operations, full object/role isolation and organisational acceptance remain open in LAUNCH-READINESS.md.
+
+
+## 24 October 2026 — care recording work
+
+The local expanded integration suite passed 51 tests in 25.801 seconds, including 12 new care workflow tests covering three clinical record types, repeated completions, rollback after stock/batch failures, stale corrections, attributed clearing and mobile repeats. The first run exposed an incorrect assumption that the native audit table has an ID; snapshots now use the audit-row count and canonical row state. No failed result was treated as a pass. Local Chromium installation again returned a non-ZIP archive, so new browser evidence remains pending CI. PostgreSQL/browser concurrency, responsive correction dialogs and deployment checks have been added; their outcomes are not yet claimed.

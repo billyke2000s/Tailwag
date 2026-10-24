@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """Reproducible GPL modifications; fail closed if upstream anchors change."""
 
-import pathlib, sys
+import pathlib, sys, subprocess
 
 root = pathlib.Path(sys.argv[1])
+
+subprocess.run(
+    [sys.executable, str(pathlib.Path(__file__).with_name("patch-care.py")), str(root)],
+    check=True,
+)
 
 
 def replace(file, old, new):
