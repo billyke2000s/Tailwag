@@ -78,6 +78,10 @@ try {
     "-c",
     "from shelter.core import database; import asm3.users,asm3.utils,os; d=database(); r=d.query_int(\"SELECT ID FROM role WHERE RoleName = 'Veterinary team'\"); u=asm3.users.insert_user_from_form(d,'browser-test',asm3.utils.PostedData({'username':'synthetic-restricted','realname':'Synthetic restricted test','password':os.environ['ADMIN_PASSWORD'],'roles':str(r),'locationfilter':'-32'},'en_GB')); d.update('users',u,{'EnableTOTP':1,'OTPSecret':'JBSWY3DPEHPK3PXP'})",
   ]);
+  run([
+    "-c",
+    "from shelter.core import database; import asm3.configuration; d=database(); asm3.configuration.cset(d,'PDFInline','No'); asm3.configuration.cset(d,'JSWindowPrint','No')",
+  ]);
   const activeReportID = Number(
     run([
       "-c",
@@ -290,6 +294,90 @@ try {
     path: "docs/assets/platform/document-editor.png",
     fullPage: true,
   });
+  const pdfResponsePromise = editor.waitForResponse(
+    (r) =>
+      r.url().includes("/document_template_edit") &&
+      r.request().method() === "POST",
+  );
+  const pdfDownloadPromise = editor.waitForEvent("download");
+  await editor
+    .getByRole("button", { name: "View this document as a PDF", exact: true })
+    .click();
+  const pdfResponse = await pdfResponsePromise;
+  if (
+    pdfResponse.status() !== 200 ||
+    !pdfResponse.headers()["content-type"]?.includes("application/pdf")
+  )
+    throw Error("Real document PDF export failed");
+  const download = await pdfDownloadPromise;
+  const pdfPath = `${temp}/synthetic-agreement.pdf`;
+  await download.saveAs(pdfPath);
+  const extracted = spawnSync("pdftotext", [pdfPath, "-"], {
+    encoding: "utf8",
+  });
+  if (
+    extracted.status !== 0 ||
+    !extracted.stdout.includes(
+      "Synthetic agreement saved through the real editor.",
+    )
+  )
+    throw Error("Downloaded PDF is missing editor content");
+  const printResponsePromise = editor.waitForResponse(
+    (r) =>
+      r.url().includes("/document_template_edit") &&
+      r.request().method() === "POST",
+  );
+  await editor.getByRole("button", { name: "Print", exact: true }).click();
+  const printResponse = await printResponsePromise;
+  if (
+    printResponse.status() !== 200 ||
+    !printResponse.headers()["content-security-policy"]?.includes("sandbox")
+  )
+    throw Error("Print preview policy missing");
+  await editor
+    .getByText("Use your browser Print command.", { exact: false })
+    .waitFor();
+  await editor.setViewportSize({ width: 1440, height: 1000 });
+  await editor.screenshot({
+    path: "docs/assets/platform/print-preview.png",
+    fullPage: true,
+  });
+  const previewProbe = await editor.context().newPage();
+  await previewProbe.goto("http://localhost:5000/main");
+  const probeResponsePromise = previewProbe.waitForResponse(
+    (r) =>
+      r.url().includes("/document_template_edit") &&
+      r.request().method() === "POST",
+  );
+  await previewProbe.evaluate(() => {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/document_template_edit";
+    const values = {
+      mode: "print",
+      dtid: "900000",
+      document:
+        '<p>Synthetic print probe</p><img src="data:image/png;base64,bad" onerror="window.__twPrintXSS=true">',
+    };
+    for (const [name, value] of Object.entries(values)) {
+      const input = document.createElement("input");
+      input.name = name;
+      input.value = value;
+      form.append(input);
+    }
+    document.body.append(form);
+    form.submit();
+  });
+  const probeResponse = await probeResponsePromise;
+  if (probeResponse.status() !== 200) throw Error("Print probe did not render");
+  await previewProbe
+    .getByText("Synthetic print probe", { exact: true })
+    .waitFor();
+  if (await previewProbe.evaluate(() => Boolean(window.__twPrintXSS)))
+    throw Error("Print preview event handler executed");
+  if ((await previewProbe.evaluate(() => window.origin)) !== "null")
+    throw Error("Print preview did not receive an opaque sandbox origin");
+  await previewProbe.close();
   await editor.close();
   const oldAsset = await page.request.get(
     "http://localhost:5000/static/lib/tinymce/5.5.1/tinymce/js/tinymce/tinymce.min.js",
@@ -354,7 +442,12 @@ print(json.dumps({'ids':ids,'stock':stock,'date':date}))
       .click();
     const savedResponse = await response;
     if (savedResponse.status() !== 200)
-      throw Error("Care dialog save failed: " + savedResponse.status() + " " + (await savedResponse.text()).slice(0, 300));
+      throw Error(
+        "Care dialog save failed: " +
+          savedResponse.status() +
+          " " +
+          (await savedResponse.text()).slice(0, 300),
+      );
     await careDialog.waitFor({ state: "hidden" });
   };
   await saveCare();
@@ -664,6 +757,8 @@ print(json.dumps({'ids':ids,'stock':stock,'date':date}))
       staffViewports: 3,
       roleBoundaries,
       documentSave: "passed",
+      documentPDFExport: "passed",
+      sandboxedPrintPreview: "passed",
       passwordChange: "passed",
       credentialSessionRevocation: "passed",
       privilegeSessionRevocation: "passed",

@@ -237,3 +237,21 @@ replace(
     """        asm3.al.debug("%s changed settings: theme=%s, locale=%s, realname=%s, email=%s, quicklinks=%s, twofacode=%s, twofapass=%s" % (o.user, theme, locale, realname, email, quicklinks, twofavalidcode, twofavalidpassword), "main.change_password", o.dbo)""",
     """        asm3.al.debug("Account settings changed", "main.change_user_settings", o.dbo)""",
 )
+
+replace(
+    "src/main.py",
+    '    def post_print(self, o):\n        self.check(asm3.users.VIEW_MEDIA)\n        l = o.locale\n        post = o.post\n        self.content_type("text/html")\n        return "%s%s%s" % (asm3.html.tinymce_print_header(_("Print Preview", l)), post["document"], "</body></html>")\n',
+    '    def post_print(self, o):\n        self.check(asm3.users.VIEW_MEDIA)\n        from shelter.documents import print_preview\n        return print_preview(self, o.post["document"])\n',
+)
+
+replace(
+    "src/main.py",
+    '    def post_print(self, o):\n        post = o.post\n        l = o.locale\n        self.content_type("text/html")\n        return "%s%s%s" % (asm3.html.tinymce_print_header(_("Print Preview", l)), post["document"], "</body></html>")\n',
+    '    def post_print(self, o):\n        from shelter.documents import print_preview\n        return print_preview(self, o.post["document"])\n',
+)
+
+replace(
+    "src/main.py",
+    '    def post_print(self, o):\n        self.check(asm3.users.VIEW_MEDIA)\n        l = o.locale\n        self.content_type("text/html")\n        return "%s%s%s" % (asm3.html.tinymce_print_header(_("Print Preview", l)), o.post["document"], "</body></html>")\n',
+    '    def post_print(self, o):\n        self.check(asm3.users.VIEW_MEDIA)\n        from shelter.documents import print_preview\n        return print_preview(self, o.post["document"])\n',
+)

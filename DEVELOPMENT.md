@@ -1,6 +1,6 @@
 # Development
 
-Prerequisites: Git, Python 3.12, Node 22.12+, npm; Linux native libraries required by Pillow/WeasyPrint. PostgreSQL 16 and Docker Compose v2 are needed for server checks. No operational credentials or records belong in a development checkout.
+Prerequisites: Git, Python 3.12, Node 22.12+, npm; Linux native libraries required by Pillow/WeasyPrint, DejaVu fonts and Poppler utilities (`poppler-utils`) for export tests. PostgreSQL 16 and Docker Compose v2 are needed for server checks. No operational credentials or records belong in a development checkout.
 
 ```sh
 git clone https://github.com/billyke2000s/Tailwag.git

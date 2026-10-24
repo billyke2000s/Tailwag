@@ -52,7 +52,7 @@ values = {
         }
     ),
     "from_address": value("SMTP_FROM", "not-configured@example.invalid"),
-    "html_to_pdf": "weasyprint %(input)s %(output)s",
+    "html_to_pdf": "",
     "large_files_chunked": "false",
 }
 pathlib.Path(values["disk_cache"]).mkdir(parents=True, exist_ok=True)

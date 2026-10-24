@@ -27,3 +27,9 @@ docker exec "$public" python scripts/healthcheck.py
 docker exec "$staff" python -c 'import urllib.request,urllib.error; r=urllib.request.urlopen("http://localhost:5000/login",timeout=10); assert r.status==200; print("Production-settings staff login reachable")'
 common python -c 'from shelter.core import database; d=database(); assert d.query_int("SELECT COUNT(*) FROM animal")==0; print("Production-settings database remains free of seed animals")'
 echo 'Disposable production-settings application smoke passed'
+
+# Export from the actual image: fonts and worker dependencies must be present.
+common python -c 'from shelter.core import database; import asm3.utils; from pathlib import Path; Path("runtime/synthetic-export.pdf").write_bytes(asm3.utils.html_to_pdf(database(), "<h1>Synthetic container PDF export</h1>"))'
+docker cp "$public:/app/runtime/synthetic-export.pdf" /tmp/tailwag-synthetic-export-"$suffix".pdf
+python3 -c 'import subprocess,sys; text=subprocess.check_output(["pdftotext",sys.argv[1],"-"]).decode(); assert "Synthetic container PDF export" in text; print("Container PDF export has readable text")' /tmp/tailwag-synthetic-export-"$suffix".pdf
+rm /tmp/tailwag-synthetic-export-"$suffix".pdf
