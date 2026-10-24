@@ -74,7 +74,10 @@ try {
     "-c",
     "from shelter.core import database; import asm3.utils; d=database(); d.insert('templatedocument',{'ID':900000,'Name':'synthetic-browser.html','Path':'/','ShowAt':'everywhere','Content':asm3.utils.base64encode('<p>Synthetic agreement fixture</p>')},generateID=False)",
   ]);
-  run(["-c", "from shelter.core import database; import asm3.users,asm3.utils,os; d=database(); r=d.query_int(\"SELECT ID FROM role WHERE RoleName = 'Veterinary team'\"); u=asm3.users.insert_user_from_form(d,'browser-test',asm3.utils.PostedData({'username':'synthetic-restricted','realname':'Synthetic restricted test','password':os.environ['ADMIN_PASSWORD'],'roles':str(r),'locationfilter':'999999'},'en_GB')); d.update('users',u,{'EnableTOTP':1,'OTPSecret':'JBSWY3DPEHPK3PXP'})"]);
+  run([
+    "-c",
+    "from shelter.core import database; import asm3.users,asm3.utils,os; d=database(); r=d.query_int(\"SELECT ID FROM role WHERE RoleName = 'Veterinary team'\"); u=asm3.users.insert_user_from_form(d,'browser-test',asm3.utils.PostedData({'username':'synthetic-restricted','realname':'Synthetic restricted test','password':os.environ['ADMIN_PASSWORD'],'roles':str(r),'locationfilter':'-32'},'en_GB')); d.update('users',u,{'EnableTOTP':1,'OTPSecret':'JBSWY3DPEHPK3PXP'})",
+  ]);
   const activeReportID = Number(
     run([
       "-c",
@@ -303,8 +306,8 @@ from shelter.care import record_care
 assert __import__('os').environ['DEMO_DATA'] == 'true'
 d = database(); date = asm3.i18n.python2display('en_GB', d.today())
 ids = []
-for i in range(2):
-    regimen = asm3.medical.insert_regimen_from_form(d, 'browser-test', asm3.utils.PostedData({'animal':'1','startdate':date,'treatmentname':'Synthetic browser care '+str(i),'dosage':'Synthetic text only; no dose','singlemulti':'0','treatmentrule':'0','status':'0'},'en_GB'))
+for i in range(3):
+    regimen = asm3.medical.insert_regimen_from_form(d, 'browser-test', asm3.utils.PostedData({'animal':str(2 if i == 2 else 1),'startdate':date,'treatmentname':'Synthetic browser care '+str(i),'dosage':'Synthetic text only; no dose','singlemulti':'0','treatmentrule':'0','status':'0'},'en_GB'))
     ids.append(d.query_int('SELECT ID FROM animalmedicaltreatment WHERE AnimalMedicalID = ?', [regimen]))
 stock = asm3.stock.insert_stocklevel_from_form(d, asm3.utils.PostedData({'name':'Synthetic browser supply','unitname':'synthetic units','balance':'10','total':'10','usagedate':date,'usagetype':'1','location':'1'},'en_GB'), 'browser-test')
 print(json.dumps({'ids':ids,'stock':stock,'date':date}))
@@ -437,17 +440,51 @@ print(json.dumps({'ids':ids,'stock':stock,'date':date}))
   ]);
   const restrictedContext = await browser.newContext();
   await restrictedContext.request.get("http://localhost:5000/login");
-  const restrictedLogin = await restrictedContext.request.post("http://localhost:5000/login", {
-    headers: { Origin: "http://localhost:5000" },
-    form: { username: "synthetic-restricted", password, onetimepass: otp("JBSWY3DPEHPK3PXP"), database: "" },
-  });
-  if (restrictedLogin.status() !== 200) throw Error("Restricted care account sign-in failed");
-  const restrictedGet = await restrictedContext.request.get("http://localhost:5000/animal_medical?id=1");
-  const restrictedWrite = await restrictedContext.request.post("http://localhost:5000/medical", {
-    headers: { Origin: "http://localhost:5000" },
-    form: { mode: "given", ids: String(careFixture.ids[0]), newdate: careFixture.date, item: "-1" },
-  });
-  if (restrictedGet.status() !== 403 || restrictedWrite.status() !== 403) throw Error("Clinical animal object boundary failed");
+  const restrictedLogin = await restrictedContext.request.post(
+    "http://localhost:5000/login",
+    {
+      headers: { Origin: "http://localhost:5000" },
+      form: {
+        username: "synthetic-restricted",
+        password,
+        onetimepass: otp("JBSWY3DPEHPK3PXP"),
+        database: "",
+      },
+    },
+  );
+  if (restrictedLogin.status() !== 200)
+    throw Error("Restricted care account sign-in failed");
+  const restrictedGet = await restrictedContext.request.get(
+    "http://localhost:5000/animal_medical?id=1",
+  );
+  const restrictedWrite = await restrictedContext.request.post(
+    "http://localhost:5000/medical",
+    {
+      headers: { Origin: "http://localhost:5000" },
+      form: {
+        mode: "given",
+        ids: String(careFixture.ids[0]),
+        newdate: careFixture.date,
+        item: "-1",
+      },
+    },
+  );
+  if (restrictedGet.status() !== 403 || restrictedWrite.status() !== 403)
+    throw Error("Clinical animal object boundary failed");
+  const allowedClinicalWrite = await restrictedContext.request.post(
+    "http://localhost:5000/medical",
+    {
+      headers: { Origin: "http://localhost:5000" },
+      form: {
+        mode: "given",
+        ids: String(careFixture.ids[2]),
+        newdate: careFixture.date,
+        item: "-1",
+      },
+    },
+  );
+  if (allowedClinicalWrite.status() !== 200)
+    throw Error("Authorised assigned-animal completion failed");
   await restrictedContext.close();
   const fosterPerson = Number(
     run([

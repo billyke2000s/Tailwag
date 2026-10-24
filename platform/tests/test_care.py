@@ -360,3 +360,9 @@ class CareWorkflowTests(TestCase):
                 ),
                 10,
             )
+
+    def test_veterinary_template_has_reviewed_completion_permissions(self):
+        from shelter.roles import ROLES
+
+        self.assertIn(asm3.users.BULK_COMPLETE_MEDICAL, ROLES["Veterinary team"])
+        self.assertIn(asm3.users.BULK_COMPLETE_VACCINATION, ROLES["Veterinary team"])

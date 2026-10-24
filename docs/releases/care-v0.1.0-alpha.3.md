@@ -4,6 +4,7 @@ This candidate extends the reviewed care completion workflows. It is not approva
 
 ## Changes
 
+- Preserve native clinical permissions and check the linked animal boundary before reviewed completion writes. New-install veterinary templates include the reviewed completion flags; existing role maps are not silently broadened.
 - Reject repeated/mixed-state care completions before updating records or deducting stock, including reviewed mobile shortcuts.
 - Commit treatment/vaccination/test completion, generated follow-ups, stock usage and native audit changes together on the reviewed paths; roll back if a statement or later step fails.
 - Require an explicit correction action, reason and current record snapshot. Stale corrections are rejected. Correct one record at a time; normal completion still supports batches.
