@@ -128,6 +128,127 @@ with tempfile.TemporaryDirectory(prefix="care-pg-test-") as tmp:
         )
         == 1
     )
+    # Real PostgreSQL transaction: competing completion and interrupted stock write.
+    import json
+    from unittest.mock import patch
+    import asm3.medical, asm3.stock
+    from shelter.care import record_care, snapshot
+
+    date = asm3.i18n.python2display("en_GB", dbo.today())
+    treatment_ids = []
+    for i in range(2):
+        regimen = asm3.medical.insert_regimen_from_form(
+            dbo,
+            "pg-test",
+            asm3.utils.PostedData(
+                {
+                    "animal": str(animal_ids[0]),
+                    "startdate": date,
+                    "treatmentname": "Synthetic PG care fixture " + str(i),
+                    "dosage": "Synthetic text only; no dose",
+                    "singlemulti": "0",
+                    "treatmentrule": "0",
+                    "status": "0",
+                },
+                "en_GB",
+            ),
+        )
+        treatment_ids.append(
+            dbo.query_int(
+                "SELECT ID FROM animalmedicaltreatment WHERE AnimalMedicalID = ?",
+                [regimen],
+            )
+        )
+    care_stock = asm3.stock.insert_stocklevel_from_form(
+        dbo,
+        asm3.utils.PostedData(
+            {
+                "name": "Synthetic PG supply",
+                "unitname": "synthetic units",
+                "balance": "10",
+                "total": "10",
+                "usagedate": date,
+                "usagetype": "1",
+                "location": "1",
+            },
+            "en_GB",
+        ),
+        "pg-test",
+    )
+    care_payload = {
+        "ids": str(treatment_ids[0]),
+        "newdate": date,
+        "item": str(care_stock),
+        "quantity": "2",
+        "usagetype": "1",
+    }
+    care_ready = Barrier(2)
+
+    def complete_care(_):
+        care_ready.wait(timeout=10)
+        try:
+            with writer_lock():
+                record_care(
+                    core.database(),
+                    "pg-test",
+                    asm3.utils.PostedData(care_payload, "en_GB"),
+                )
+            return "recorded"
+        except asm3.utils.ASMValidationError:
+            return "rejected"
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(complete_care, range(2)))
+    assert sorted(results) == ["recorded", "rejected"], results
+    assert (
+        dbo.query_float("SELECT Balance FROM stocklevel WHERE ID = ?", [care_stock])
+        == 8
+    )
+    before_audit = dbo.query_int("SELECT COUNT(*) FROM audittrail")
+    failed_payload = {**care_payload, "ids": str(treatment_ids[1])}
+    with patch(
+        "asm3.stock.insert_stockusage",
+        side_effect=RuntimeError("Synthetic PG interruption"),
+    ):
+        try:
+            record_care(dbo, "pg-test", asm3.utils.PostedData(failed_payload, "en_GB"))
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("Expected injected care interruption")
+    assert (
+        dbo.query_date(
+            "SELECT DateGiven FROM animalmedicaltreatment WHERE ID = ?",
+            [treatment_ids[1]],
+        )
+        is None
+    )
+    assert (
+        dbo.query_float("SELECT Balance FROM stocklevel WHERE ID = ?", [care_stock])
+        == 8
+    )
+    assert dbo.query_int("SELECT COUNT(*) FROM audittrail") == before_audit
+    care_row = dbo.first_row(
+        dbo.query(
+            "SELECT * FROM animalmedicaltreatment WHERE ID = ?", [treatment_ids[0]]
+        )
+    )
+    correction = {
+        **care_payload,
+        "item": "-1",
+        "recordaction": "correct",
+        "correctionreason": "Synthetic PG correction",
+        "recordversions": json.dumps(
+            {str(care_row.ID): snapshot(dbo, "animalmedicaltreatment", care_row)}
+        ),
+    }
+    record_care(dbo, "pg-reviewer", asm3.utils.PostedData(correction, "en_GB"))
+    try:
+        record_care(dbo, "pg-reviewer", asm3.utils.PostedData(correction, "en_GB"))
+    except asm3.utils.ASMValidationError:
+        pass
+    else:
+        raise AssertionError("Stale PG correction accepted")
     subprocess.run(
         ["pg_dump", "--format=custom", "--file", tmp + "/care.dump", name],
         env=env,
@@ -167,10 +288,28 @@ with tempfile.TemporaryDirectory(prefix="care-pg-test-") as tmp:
                     [person],
                 )
                 assert cursor.fetchone()[0] == 1
+                cursor.execute(
+                    "SELECT Balance FROM stocklevel WHERE ID = %s", [care_stock]
+                )
+                assert cursor.fetchone()[0] == 8
+                cursor.execute(
+                    "SELECT DateGiven, Comments FROM animalmedicaltreatment WHERE ID = %s",
+                    [treatment_ids[0]],
+                )
+                completed = cursor.fetchone()
+                assert (
+                    completed[0] is not None
+                    and "Synthetic PG correction" in completed[1]
+                )
+                cursor.execute(
+                    "SELECT DateGiven FROM animalmedicaltreatment WHERE ID = %s",
+                    [treatment_ids[1]],
+                )
+                assert cursor.fetchone()[0] is None
     finally:
         with admin.cursor() as cursor:
             cursor.execute("DROP DATABASE IF EXISTS tailwag_restore_test WITH (FORCE)")
         admin.close()
 print(
-    "PostgreSQL installation, migration, shared IDs, submissions, concurrent foster capacity and restore passed"
+    "PostgreSQL installation, migration, shared IDs, submissions, concurrent foster capacity, care concurrency/rollback/corrections and restore passed"
 )

@@ -29,7 +29,13 @@ if (
 adaptation = hashlib.sha256(
     b"".join(
         (root / name).read_bytes()
-        for name in ["scripts/patch-core.py", "static/staff.css", "browser-assets.json"]
+        for name in [
+            "scripts/patch-core.py",
+            "scripts/patch-care.py",
+            "static/staff.css",
+            "static/care-workflows.js",
+            "browser-assets.json",
+        ]
     )
 ).hexdigest()[:12]
 build = lock["commit"][:12] + "-tw-" + adaptation

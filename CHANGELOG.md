@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — care-v0.1.0-alpha.3
+
+- Guard care completion replays and stock validation on reviewed staff/mobile paths.
+- Add transactional clinical/stock/audit updates and attributed stale-safe corrections.
+- Add responsive correction/clear dialogs and synthetic failure/concurrency verification.
+
 ## care-v0.1.0-alpha.2 — 23 October 2026 · evaluation prerelease
 
 - Reject overlapping dated movements and ignored-field precheck bypasses before native mutations.
