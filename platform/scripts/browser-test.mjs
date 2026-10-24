@@ -352,8 +352,9 @@ print(json.dumps({'ids':ids,'stock':stock,'date':date}))
     await careDialog
       .getByRole("button", { name: "Save care record", exact: true })
       .click();
-    if ((await response).status() !== 200)
-      throw Error("Care dialog save failed");
+    const savedResponse = await response;
+    if (savedResponse.status() !== 200)
+      throw Error("Care dialog save failed: " + savedResponse.status() + " " + (await savedResponse.text()).slice(0, 300));
     await careDialog.waitFor({ state: "hidden" });
   };
   await saveCare();

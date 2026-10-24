@@ -8,7 +8,7 @@ This candidate extends the reviewed care completion workflows. It is not approva
 - Reject repeated/mixed-state care completions before updating records or deducting stock, including reviewed mobile shortcuts.
 - Commit treatment/vaccination/test completion, generated follow-ups, stock usage and native audit changes together on the reviewed paths; roll back if a statement or later step fails.
 - Require an explicit correction action, reason and current record snapshot. Stale corrections are rejected. Correct one record at a time; normal completion still supports batches.
-- Preserve attribution and prior audit history. Clearing an erroneous treatment completion retains its comments and original administrator. It never automatically returns supplies to stock.
+- Preserve attribution and prior audit history. Clearing an erroneous treatment completion retains its comments and original administrator. It never automatically returns supplies to stock or restarts a treatment plan; it creates an assigned native review task in the same transaction.
 - Provide shared responsive care dialogs, retained validation errors and correction defaults from the selected record. Hide stock and follow-up creation during corrections.
 - Test repeated requests, negative/invalid/insufficient stock, partial failures and stale snapshots with synthetic data; extend browser and PostgreSQL checks.
 

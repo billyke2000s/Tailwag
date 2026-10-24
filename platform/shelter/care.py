@@ -9,6 +9,7 @@ import re
 
 import asm3.i18n
 import asm3.animal
+import asm3.diary
 import asm3.medical
 import asm3.stock
 import asm3.utils
@@ -134,8 +135,10 @@ def record_care(dbo, username, post, kind="medical", undo=False):
     if action != "undo" and (date is None or date > dbo.today()):
         reject("Enter a valid completed care date that is not in the future")
     if kind == "medical" and action != "undo" and post["newtime"]:
-        if not re.fullmatch(r"(?:[01][0-9]|2[0-3]):[0-5][0-9]", post["newtime"]):
-            reject("Enter a valid time in HH:MM format")
+        if not re.fullmatch(
+            r"(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?", post["newtime"]
+        ):
+            reject("Enter a valid time in HH:MM or HH:MM:SS format")
         date = asm3.i18n.parse_time(date, post["newtime"])
         if date > dbo.now():
             reject("Completed care cannot have a future time")
@@ -199,6 +202,29 @@ def record_care(dbo, username, post, kind="medical", undo=False):
                 asm3.medical.update_treatment_given(
                     db, username, row.ID, date, by, vet, comments
                 )
+                if action == "undo":
+                    # A factual correction is not authority to restart a plan.
+                    # Create a visible owner task; never send immediate email.
+                    asm3.diary.insert_diary_from_form(
+                        db,
+                        username,
+                        0,
+                        row.ANIMALID,
+                        asm3.utils.PostedData(
+                            {
+                                "diarydate": asm3.i18n.python2display(
+                                    db.locale, db.today()
+                                ),
+                                "diarytime": db.now().strftime("%H:%M:%S"),
+                                "diaryfor": username,
+                                "subject": "Review care plan after completion correction",
+                                "note": f"Erroneous completion cleared for treatment {row.ID}. Review regimen status and reconcile stock against physical usage before further action. This task does not authorise treatment.",
+                                "comments": reason,
+                                "emailnow": "",
+                            },
+                            db.locale,
+                        ),
+                    )
             elif kind == "vaccination":
                 for field in ("givenexpires", "givenbatchexpiry"):
                     if post[field] and post.date(field) is None:

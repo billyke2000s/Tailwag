@@ -204,6 +204,8 @@ class CareWorkflowTests(TestCase):
             "",
             "bad",
             "0",
+            "99999999999",
+            "1" * 5000,
         ):
             with self.subTest(ids=ids):
                 with self.assertRaises(asm3.utils.ASMValidationError):
@@ -256,6 +258,15 @@ class CareWorkflowTests(TestCase):
         self.give(undo, actor="synthetic-reviewer")
         row = self.row("medical", rid)
         self.assertIsNone(row.DATEGIVEN)
+        task = self.dbo.first_row(
+            self.dbo.query(
+                "SELECT * FROM diary WHERE LinkID = ? AND Subject = ?",
+                [row.ANIMALID, "Review care plan after completion correction"],
+            )
+        )
+        self.assertIsNotNone(task)
+        self.assertEqual(task.DIARYFORNAME, "synthetic-reviewer")
+        self.assertIsNone(task.DATECOMPLETED)
         self.assertEqual(row.GIVENBY, "Synthetic carer")
         self.assertIn("Synthetic administration", row.COMMENTS)
         self.assertIn("Synthetic correction reason", row.COMMENTS)
@@ -366,3 +377,32 @@ class CareWorkflowTests(TestCase):
 
         self.assertIn(asm3.users.BULK_COMPLETE_MEDICAL, ROLES["Veterinary team"])
         self.assertIn(asm3.users.BULK_COMPLETE_VACCINATION, ROLES["Veterinary team"])
+
+    def test_native_seconds_time_is_preserved_in_completion_and_correction(self):
+        rid, _, payload = self.fixture()
+        payload.update(
+            newdate=asm3.i18n.python2display(
+                "en_GB", asm3.i18n.add_days(self.dbo.today(), -1)
+            ),
+            newtime="00:00:31",
+            item="-1",
+        )
+        self.give(payload)
+        self.assertEqual(self.row("medical", rid).DATEGIVEN.second, 31)
+        correction = self.correction("medical", rid, payload)
+        correction["newtime"] = "00:00:32"
+        self.give(correction)
+        self.assertEqual(self.row("medical", rid).DATEGIVEN.second, 32)
+
+    def test_clear_review_task_failure_rolls_back_correction(self):
+        rid, _, payload = self.fixture()
+        self.give({**payload, "item": "-1"})
+        original = dict(self.row("medical", rid))
+        undo = self.correction("medical", rid, payload, "undo")
+        with patch(
+            "asm3.diary.insert_diary_from_form",
+            side_effect=RuntimeError("Synthetic task write failure"),
+        ):
+            with self.assertRaises(RuntimeError):
+                self.give(undo)
+        self.assertEqual(dict(self.row("medical", rid)), original)

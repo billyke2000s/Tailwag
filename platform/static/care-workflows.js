@@ -13,7 +13,7 @@ window.tailwagCare = {
         type: "textarea",
         label: "Correction reason",
         callout:
-          "Required for corrections. Stock is reconciled separately; clearing a record does not put supplies back into stock.",
+          "Required for corrections. Clearing assigns you a care-plan review task; it does not restart treatment or put supplies back into stock.",
       },
       {
         type: "raw",
