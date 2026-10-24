@@ -1,6 +1,6 @@
 # Verification record
 
-Latest evaluation release: [care-v0.1.0-alpha.2](https://github.com/billyke2000s/Tailwag/releases/tag/care-v0.1.0-alpha.2), verified in the 23 October section below.
+Latest evaluation release: [care-v0.1.0-alpha.3](https://github.com/billyke2000s/Tailwag/releases/tag/care-v0.1.0-alpha.3), verified in the 24 October section below.
 
 ## 22 October 2026 — historical alpha.1 evidence
 
@@ -85,3 +85,10 @@ The expanded local rerun passed 53 tests in 26.109 seconds after adding linked-a
 CI [40118043387](https://github.com/billyke2000s/Tailwag/actions/runs/40118043387) passed 53 integration tests, 391 selected native tests and PostgreSQL concurrency/rollback/correction/restore checks, then failed the real correction-dialog save. The native widget submits HH:MM:SS; the new validator had only accepted HH:MM. The validator now accepts validated optional seconds without dropping them, and a regression scenario covers completion plus correction. Publication was skipped. New browser/deployment results remain pending the rerun.
 
 After the time-field correction and transactional care-plan review task, all 55 local integration tests passed in 27.481 seconds. Clearing does not infer permission to reactivate a regimen; it creates a native task assigned to the correcting actor, without immediate email. An injected task-write failure rolls back the care correction. The locked Python advisory scan again reported no known vulnerabilities. These are local results; browser/PG/deployment outcomes for this revision remain pending.
+
+
+### Published alpha.3 evidence
+
+[Push/release run 40119009905](https://github.com/billyke2000s/Tailwag/actions/runs/40119009905) passed at `0d09c98747722c91a6786c1abab10e030c10a9f8`; PR #18 merged it into main. Actual results: 55 integration tests (34.567 seconds), 391 selected native tests (188.769 seconds), dependency audits, PG concurrency/rollback/correction/dump-restore, real care/correction dialogs at three sizes, competing completion/stock requests, stale snapshot rejection, an allowed assigned-animal clinical write and denied out-of-filter write, existing 41 role boundaries/TOTP/editor/session checks, backup wrapper, image/production-start/configuration and extracted-package setup. No failed check was suppressed. Local browser installation remained unavailable; actual browser evidence comes from CI.
+
+The workflow published alpha.3 as an evaluation prerelease with source archive and SHA256SUMS.txt. GitHub reports source SHA-256 `44a7f831cffeaaf759f1fa21bb620cfdffc1ca8fd0703f4aa1210b759e75a318`. It is not a live deployment, a complete clinical/access audit or organisational acceptance. The existing APK remains independent.

@@ -1,10 +1,10 @@
 # Delivery status
 
-Updated 23 October 2026. The [care-v0.1.0-alpha.2 evaluation prerelease](https://github.com/billyke2000s/Tailwag/releases/tag/care-v0.1.0-alpha.2) is published and PR #17 is merged. The platform is integrated alongside the independent original React/PWA/Android prototype; v1.2.1 remains intact.
+Updated 24 October 2026. The [care-v0.1.0-alpha.3 evaluation prerelease](https://github.com/billyke2000s/Tailwag/releases/tag/care-v0.1.0-alpha.3) is published and PR #18 is merged. The platform is integrated alongside the independent original React/PWA/Android prototype; v1.2.1 remains intact.
 
 | Capability | State | Evidence / next gate |
 |---|---|---|
-| Canonical animal/person/care/movement backend | Adopted pinned ASM | Selected domain tests; full organisation workflows still needed |
+| Canonical animal/person/care/movement backend | Adopted pinned ASM | Reviewed transactional care completion, correction/review tasks and stock protection passed; complete clinical workflow acceptance still needed |
 | Public site and four enquiry types | Implemented | Integration tests; browser checks passed |
 | Public privacy projection and fresh eligibility | Implemented | Flags/private-comment/image tests |
 | TOTP and staff application | Implemented | Persisted enrolment, real document save/reload and password-change session revocation passed; broader account recovery review required |
@@ -17,4 +17,4 @@ Updated 23 October 2026. The [care-v0.1.0-alpha.2 evaluation prerelease](https:/
 
 Confirmed scope: England, dogs/cats, mixed rescue/foster/sanctuary, no host selected. Local council, organisation identity, activity classification and real capacity are unresolved. The implementation must not be labelled production-ready until the evidence gaps close.
 
-Alpha.2 verification: [push/release run 40038283533](https://github.com/billyke2000s/Tailwag/actions/runs/40038283533) and [PR run 40038288948](https://github.com/billyke2000s/Tailwag/actions/runs/40038288948) passed. The suite now has 39 integration tests plus 391 selected native tests. Brotli is pinned to 1.2.1 following its upstream decoder advisory; the locked Python scan passed with no exceptions. See docs/VERIFICATION.md for precise evidence and limits.
+Alpha.3 verification: [push/release run 40119009905](https://github.com/billyke2000s/Tailwag/actions/runs/40119009905) passed 55 integration tests, 391 selected native tests, real care/correction/stock and linked-animal browser checks, three correction-dialog sizes, PostgreSQL concurrency/rollback/restore and server/package checks. Existing role maps are preserved; new veterinary templates add reviewed completion flags. Native editor/import/document paths remain under review. See docs/VERIFICATION.md for evidence and limits.

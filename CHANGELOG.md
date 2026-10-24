@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — care-v0.1.0-alpha.3
+## care-v0.1.0-alpha.3 — 24 October 2026 · evaluation prerelease
 
 - Guard care completion replays and stock validation on reviewed staff/mobile paths.
 - Add transactional clinical/stock/audit updates and attributed stale-safe corrections.
