@@ -48,4 +48,9 @@ for name in FORM_NAMES.values():
 from shelter.roles import restrict_default_reports
 
 restrict_default_reports(core)
+from shelter.extensions import migrate as migrate_extensions
+from shelter.foster import install as install_foster
+
+migrate_extensions(core)
+install_foster(core)
 print("Core schema and adapter form metadata current")

@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en-GB">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ title }} · TailWag foster workspace</title><link rel="stylesheet" href="/tailwag/foster.css"></head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header><a class="brand" href="/foster"><span aria-hidden="true">✦</span> TailWag <small>Foster workspace</small></a><nav aria-label="Your workspace"><a href="/foster">Your animals</a><a href="/foster/account">Account</a><form action="/foster/logout" method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="quiet" type="submit">Sign out</button></form></nav></header>
+<main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
+<footer>Care, together. <span>For urgent welfare concerns, contact your organisation or veterinary team directly. This workspace is not an emergency service.</span></footer>
+</body></html>

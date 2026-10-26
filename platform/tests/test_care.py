@@ -266,6 +266,8 @@ class CareWorkflowTests(TestCase):
         )
         self.assertIsNotNone(task)
         self.assertEqual(task.DIARYFORNAME, "synthetic-reviewer")
+        self.assertEqual(task.LINKTYPE, asm3.diary.ANIMAL)
+        self.assertIn("Synthetic", task.LINKINFO)
         self.assertIsNone(task.DATECOMPLETED)
         self.assertEqual(row.GIVENBY, "Synthetic carer")
         self.assertIn("Synthetic administration", row.COMMENTS)

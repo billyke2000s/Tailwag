@@ -24,10 +24,29 @@ original_insert = asm3.users.insert_user_from_form
 @wraps(original_insert)
 def insert(dbo, username, post):
     validate_password(post["password"])
-    return original_insert(dbo, username, post)
+    userid = original_insert(dbo, username, post)
+    from .foster import register_account
+
+    register_account(dbo, userid, post["roles"])
+    return userid
 
 
 asm3.users.insert_user_from_form = insert
+
+original_update = asm3.users.update_user_from_form
+
+
+@wraps(original_update)
+def update(dbo, username, post):
+    from .foster import register_account
+
+    # Remember portal identities before native role deletion/reassignment. A
+    # removed portal role must not turn a carer into a generic staff login.
+    register_account(dbo, post.integer("userid"), post["roles"])
+    return original_update(dbo, username, post)
+
+
+asm3.users.update_user_from_form = update
 
 original_change = asm3.users.change_password
 

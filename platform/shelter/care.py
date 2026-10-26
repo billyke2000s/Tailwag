@@ -208,7 +208,7 @@ def record_care(dbo, username, post, kind="medical", undo=False):
                     asm3.diary.insert_diary_from_form(
                         db,
                         username,
-                        0,
+                        asm3.diary.ANIMAL,
                         row.ANIMALID,
                         asm3.utils.PostedData(
                             {

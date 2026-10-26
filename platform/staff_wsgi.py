@@ -27,6 +27,9 @@ def credential_current(self, session):
 
 main.ASMEndpoint.is_loggedin = credential_current
 
+from shelter.foster_web import install as install_foster_portal
+
+install_foster_portal(main)
 
 main.web.config.debug = False
 main.app.internalerror = lambda: main.web.internalerror(
@@ -46,6 +49,7 @@ app = WhiteNoise(
     prefix="static/",
     autorefresh=os.getenv("DEBUG") == "true",
 )
+app.add_files(str(ROOT / "static"), prefix="tailwag/")
 lock = threading.Lock()
 windows = collections.OrderedDict()
 allowed = urlsplit(os.getenv("STAFF_URL", "http://localhost:5000"))
