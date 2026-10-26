@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## Unreleased — care-v0.1.0-alpha.5
+
+- Add an optional dedicated foster workspace with fresh household access, assigned diary tasks, canonical observations and staff review.
+- Add transactional action receipts, own-account authenticator/password controls and default-deny staff routing for carers.
+- Correct the native animal diary link on new clinical correction review tasks; preserve earlier tasks for explicit review.
 
 ## care-v0.1.0-alpha.4 — 24 October 2026 · evaluation prerelease
 

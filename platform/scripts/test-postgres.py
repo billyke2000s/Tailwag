@@ -249,6 +249,70 @@ with tempfile.TemporaryDirectory(prefix="care-pg-test-") as tmp:
         pass
     else:
         raise AssertionError("Stale PG correction accepted")
+    # Real canonical portal metadata and independent per-account transaction lock.
+    from shelter import foster
+    from tests.foster_fixture import create as foster_fixture
+    import uuid
+
+    fixture = foster_fixture(dbo, env["ADMIN_PASSWORD"])
+    token = str(uuid.uuid4())
+    barrier = Barrier(2)
+
+    def observe_once(_):
+        barrier.wait()
+        return foster.act(
+            core.database(),
+            "synthetic-portal-0",
+            fixture["animals"][0],
+            token,
+            "observation",
+            "Synthetic concurrent PostgreSQL observation",
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        outcomes = list(executor.map(observe_once, range(2)))
+    assert outcomes[0] == outcomes[1]
+    assert (
+        dbo.query_int("SELECT COUNT(*) FROM tw_action_receipt WHERE Token = ?", [token])
+        == 1
+    )
+    portal_log, portal_review = outcomes[0]
+    assert (
+        dbo.query_int("SELECT LinkType FROM diary WHERE ID = ?", [portal_review])
+        == asm3.diary.ANIMAL
+    )
+    portal_user = foster.identity(dbo, "synthetic-portal-0")
+    task_row = foster.tasks(dbo, portal_user, fixture["animals"][0])[0]
+    foster.act(
+        dbo,
+        portal_user.USERNAME,
+        fixture["animals"][0],
+        str(uuid.uuid4()),
+        "task",
+        task_id=task_row.ID,
+        version=foster.task_version(portal_user, task_row),
+    )
+    before_logs = dbo.query_int("SELECT COUNT(*) FROM log")
+    from unittest.mock import patch
+
+    with patch(
+        "asm3.diary.insert_diary_from_form",
+        side_effect=RuntimeError("Synthetic portal rollback"),
+    ):
+        try:
+            foster.act(
+                dbo,
+                portal_user.USERNAME,
+                fixture["animals"][0],
+                str(uuid.uuid4()),
+                "observation",
+                "Synthetic PostgreSQL failure observation",
+            )
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("Portal failure was swallowed")
+    assert dbo.query_int("SELECT COUNT(*) FROM log") == before_logs
     subprocess.run(
         ["pg_dump", "--format=custom", "--file", tmp + "/care.dump", name],
         env=env,
@@ -306,10 +370,19 @@ with tempfile.TemporaryDirectory(prefix="care-pg-test-") as tmp:
                     [treatment_ids[1]],
                 )
                 assert cursor.fetchone()[0] is None
+                cursor.execute(
+                    "SELECT ResultID, AuxID FROM tw_action_receipt WHERE Token = %s",
+                    [token],
+                )
+                assert cursor.fetchone() == (portal_log, portal_review)
+                cursor.execute(
+                    "SELECT LinkType, LinkID FROM diary WHERE ID = %s", [portal_review]
+                )
+                assert cursor.fetchone() == (asm3.diary.ANIMAL, fixture["animals"][0])
     finally:
         with admin.cursor() as cursor:
             cursor.execute("DROP DATABASE IF EXISTS tailwag_restore_test WITH (FORCE)")
         admin.close()
 print(
-    "PostgreSQL installation, migration, shared IDs, submissions, concurrent foster capacity, care concurrency/rollback/corrections and restore passed"
+    "PostgreSQL installation, migration, shared IDs, submissions, concurrent foster capacity, care concurrency/rollback/corrections, portal replay/rollback/tasks and restore passed"
 )

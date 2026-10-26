@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="eyebrow">A little care makes a difference</p><h1>Your foster animals</h1><p class="lead">A shared place for the animals in your care, instructions from the team and your daily observations.</p>
+<div class="grid">
+{% for animal in animals %}<article class="animal-card">{% if animal.HASPHOTO %}<img src="/foster/photo/{{ animal.ID }}" alt="" loading="lazy">{% else %}<div class="photo-placeholder" aria-hidden="true">✦</div>{% endif %}<div><p class="eyebrow">{{ animal.SPECIESNAME }} · {{ animal.SHELTERCODE }}</p><h2><a href="/foster/animal/{{ animal.ID }}">{{ animal.ANIMALNAME }}</a></h2><p>View assigned instructions and share an update with the team.</p><a class="button" href="/foster/animal/{{ animal.ID }}">Open care workspace <span aria-hidden="true">→</span></a></div></article>
+{% empty %}<section class="empty"><h2>No current foster placements</h2><p>Animals appear here when the team records a current placement with your linked household. Contact the team if a placement needs correcting.</p></section>{% endfor %}
+</div>
+{% endblock %}

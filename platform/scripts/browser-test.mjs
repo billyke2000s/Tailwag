@@ -1,4 +1,5 @@
 import { chromium } from "@playwright/test";
+import { verifyFoster } from "./foster-browser.mjs";
 import { mkdtempSync, mkdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
@@ -20,6 +21,7 @@ const env = {
   PGDATABASE: `${temp}/core.sqlite3`,
   PORTAL_DB_PATH: `${temp}/portal.sqlite3`,
   STAFF_URL: "http://localhost:5000",
+  FOSTER_PORTAL_ENABLED: "true",
 };
 delete env.PGHOST;
 const servers = [];
@@ -82,6 +84,12 @@ try {
     "-c",
     "from shelter.core import database; import asm3.configuration; d=database(); asm3.configuration.cset(d,'PDFInline','No'); asm3.configuration.cset(d,'JSWindowPrint','No')",
   ]);
+  const fosterFixture = JSON.parse(
+    run([
+      "-c",
+      "import json,os; from shelter.core import database; from tests.foster_fixture import create; print(json.dumps(create(database(),os.environ['ADMIN_PASSWORD'])))",
+    ]),
+  );
   const activeReportID = Number(
     run([
       "-c",
@@ -748,6 +756,30 @@ print(json.dumps({'ids':ids,'stock':stock,'date':date}))
     form: { username: "care-admin", password: "invalid" },
   });
   if (forbidden.status() !== 403) throw Error("Foreign origin not blocked");
+  // Use a fresh synthetic staff process for the separate carer suite. The login
+  // abuse limiter remains unchanged; prior staff tests deliberately use many accounts.
+  const staffProcess = servers[1];
+  staffProcess.kill("SIGTERM");
+  await new Promise((done) => staffProcess.once("exit", done));
+  servers.push(
+    spawn(
+      python,
+      [
+        "-m",
+        "gunicorn",
+        "--bind",
+        "127.0.0.1:5000",
+        "--workers",
+        "1",
+        "--threads",
+        "4",
+        "staff_wsgi:application",
+      ],
+      { cwd: root, env, stdio: "ignore" },
+    ),
+  );
+  await ready("http://localhost:5000/login");
+  await verifyFoster({ browser, run, password, otp, fixture: fosterFixture });
   console.log(
     JSON.stringify({
       publicRoutes: checked,

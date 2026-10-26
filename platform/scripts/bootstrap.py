@@ -79,6 +79,14 @@ for name, flags in ROLES.items():
 from shelter.roles import restrict_default_reports
 
 restrict_default_reports(dbo)
+from shelter.extensions import migrate as migrate_extensions
+from shelter.foster import install as install_foster
+
+migrate_extensions(dbo)
+install_foster(dbo)
+asm3.configuration.cset(
+    dbo, "TailWagFosterReviewUser", os.getenv("ADMIN_USERNAME", "care-admin")
+)
 for name in FORM_NAMES.values():
     fields = [
         {
