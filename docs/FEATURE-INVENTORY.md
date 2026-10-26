@@ -7,7 +7,7 @@ Inventory based on the [ASM 52u manual index](https://sheltermanager.com/repo/as
 | Search, links, animal records, templates, bulk changes, observations, litters | Retained | Canonical records; bulk/import safety still requires review |
 | People, household information, flags, deduplication, bulk changes | Retained | Assessment/privacy/access policies required |
 | Movements, reservations, trials, books, coordinators | Adapted | Selected adoption/foster guards added; universal atomicity/occupancy not claimed |
-| Documents, PDF directives, templates, electronic/mobile/user signatures | Retained/gated | Scanner and approved agreement/signature workflow required |
+| Documents, PDF directives, templates, electronic/mobile/user signatures | Adapted/gated | Bounded PDF worker and selected sandboxed print previews verified; supported directives in DOCUMENTS.md; scanner and approved agreement/signature workflow still required |
 | Animal control, incidents, dispatch, citations, licensing and equipment | Optional, gated | Not default enforcement functionality for a rescue; logs/incidents used as appropriate |
 | Boarding book/calendar | Optional, gated | Only after actual activity/licensing decision |
 | Clinic waiting/consulting rooms/calendar | Optional, gated | Only for authorised actual clinical services |

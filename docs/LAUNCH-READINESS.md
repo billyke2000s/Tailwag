@@ -9,9 +9,9 @@ No live service or production-ready claim is made. An appointed organisation own
 | Care SOPs | Vet-authorised treatment, infection isolation, feeding/enrichment, welfare escalation, incident/death procedures | Native records available; organisational SOP approval outstanding |
 | Lifecycle integrity | Intake through assessment, medical care, foster, adoption, return, transfer, sanctuary, death; invalid transitions and all bulk/import paths | Selected tests only |
 | Capacity/compatibility | Rooms/enclosures/foster household capacity, species and compatibility, concurrent/interrupt tests | Dated household/peak-capacity and simultaneous staff/PG checks passed; premises, intraday compatibility and interrupted-write coverage remain open |
-| Access | Endpoint/object tests for every role, exports, search, media, reports, permissions | Role templates unassigned; foster-only logins gated |
+| Access | Endpoint/object tests for every role, exports, search, media, reports, permissions | Role templates unassigned; do not issue foster-only accounts until a dedicated object boundary is verified |
 | Privacy | Controller notice, lawful bases, minimisation, retention schedule, legal holds, correction/export/deletion drill | Candidate notice; actual policy not approved |
-| Browser assets | Editor migration/save/print and remaining native widgets security review | Pinned replacements; editor save/reload and basic sanitisation passed; print/PDF/signature paths and full inventory not cleared |
+| Browser assets | Editor migration/save/print and remaining native widgets security review | Pinned replacements; editor save/reload, real PDF export and selected sandboxed print previews passed; signature paths and full inventory not cleared |
 | Uploads | Installed scanner, malicious/oversized/polyglot/error tests on every route | Normal image/PDF wrapper implemented; alternate paths outstanding |
 | Operations | Host, DNS, TLS, secrets, monitoring, patch owner and support escalation | No host selected |
 | Jobs/email | Real test sender, failure/retry reconciliation, UK daylight-saving schedule and interrupted-job drill | Scripts prepared; provider unconfigured |

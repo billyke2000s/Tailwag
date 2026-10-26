@@ -13,7 +13,7 @@ An operational platform in development for rescue, foster and sanctuary teams.
 [![Core: ASM 52u](https://img.shields.io/badge/core-ASM_52u-164e43)](platform/upstream.json)
 [![Platform: GPL v3](https://img.shields.io/badge/platform-GPL_v3-blue)](platform/LICENSE)
 
-[Evaluation release](https://github.com/billyke2000s/Tailwag/releases/tag/care-v0.1.0-alpha.3) · [Quick start](#run-locally) · [Architecture](ARCHITECTURE.md) · [Staff guide](docs/operations/STAFF.md) · [Deployment](DEPLOYMENT.md) · [Verification](docs/VERIFICATION.md)
+[Evaluation release](https://github.com/billyke2000s/Tailwag/releases/tag/care-v0.1.0-alpha.4) · [Quick start](#run-locally) · [Architecture](ARCHITECTURE.md) · [Staff guide](docs/operations/STAFF.md) · [Deployment](DEPLOYMENT.md) · [Verification](docs/VERIFICATION.md)
 
 </div>
 
@@ -35,6 +35,7 @@ The platform connects an animal's identity, care, people, placements and history
 | Connected enquiries | Adoption, foster, volunteer and contact forms; validation, CSRF, abuse controls and receipts | Manual native inbox review; no automatic placement or email claim |
 | Animal care | Pinned ASM care records; reviewed transactional completion, stock protection and attributed correction tasks | Veterinary SOPs and complete user acceptance still required |
 | Placements | Native movement history; assessed households, dated overlap/peak foster-capacity guards and sanctuary checks | Selected paths tested; alternate/bulk/import and interruption gates remain |
+| Documents | Restricted PDF export and isolated print previews | Reviewed editor/template/media routes; signatures and other routes need separate acceptance |
 | Team operations | Native tasks, rota/training, stock, finance, search and reports | Least-privilege role templates require full boundary verification |
 | Server preparation | PostgreSQL, migrations, container, TLS proxy, jobs, health, backup/restore helpers | No live host, provider delivery or operational recovery guarantee |
 
@@ -96,7 +97,7 @@ Role templates are unassigned starting points. The complete server-side permissi
 | Start here | Operate and maintain | Evidence and provenance |
 |---|---|---|
 | [Goals and scope](PROJECT.md) | [Development](DEVELOPMENT.md) | [Research and applicability](docs/RESEARCH.md) |
-| [Behaviour and acceptance](SPECIFICATION.md) | [Testing](TESTING.md) | [Verification results](docs/VERIFICATION.md) |
+| [Behaviour and acceptance](SPECIFICATION.md) | [Testing](TESTING.md) / [document exports](docs/DOCUMENTS.md) | [Verification results](docs/VERIFICATION.md) |
 | [Architecture](ARCHITECTURE.md) | [Deployment and rollback](DEPLOYMENT.md) | [Launch gates](docs/LAUNCH-READINESS.md) |
 | [Current progress](STATUS.md) | [Staff guide](docs/operations/STAFF.md) | [Decisions](DECISIONS.md) |
 | [Contributing](CONTRIBUTING.md) | [Administration](docs/operations/ADMINISTRATION.md) | [Credits](CREDITS.md) / [upstream](UPSTREAM.md) |

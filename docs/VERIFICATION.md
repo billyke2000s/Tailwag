@@ -94,8 +94,15 @@ After the time-field correction and transactional care-plan review task, all 55 
 The workflow published alpha.3 as an evaluation prerelease with source archive and SHA256SUMS.txt. GitHub reports source SHA-256 `44a7f831cffeaaf759f1fa21bb620cfdffc1ca8fd0703f4aa1210b759e75a318`. It is not a live deployment, a complete clinical/access audit or organisational acceptance. The existing APK remains independent.
 
 
-### Document boundary work — pending release verification
+### Document boundary work — initial local verification
 
 The first 66-test local suite passed (36.734 seconds); after adding print/hyperlink checks the expanded suite passed 68 tests (40.621 seconds). Tests generated real PDFs and checked text/geometry/raster output, rejected local/network/CSS/relative/SVG/attachment resources, observed no HTTP request at the synthetic local server, and checked secret omission and error limits. A synthetic one-page export was rendered to PNG and visually inspected: headings, notice, table, body and footer were readable without overlap or clipping. No real record or legal agreement was used. Tagged output and the added application/browser/container checks are still under verification for the final revision.
 
 The final local 68-test rerun passed in 37.882 seconds with tagged PDF output and the final 11pt default. Poppler confirmed readable text, landscape geometry and tagged output. Backup-wrapper checks, compilation, JavaScript and shell syntax and whitespace checks passed. New editor/print-preview and container-font checks remain pending CI.
+
+
+### Published alpha.4 evidence
+
+[Push/release run 40120259386](https://github.com/billyke2000s/Tailwag/actions/runs/40120259386) passed at `8cc3775229a3ca496bd201e5ee1723e092922a40`; PR #19 merged it into main. Results: 68 integration tests (51.647 seconds), 391 selected native tests (195.331 seconds), scoped Python/browser advisory scans, PostgreSQL fresh install and care/foster concurrency/rollback/restore, and all existing care/role/TOTP/session browser checks. The real editor PDF control produced a download whose synthetic text was extracted successfully. The actual print control opened the sandboxed preview; an image event-handler probe did not execute and the window had an opaque origin. The production-settings container exported readable PDF text. Backup wrapper, image/startup, Compose/Caddy and extracted-source setup passed.
+
+The workflow published [alpha.4](https://github.com/billyke2000s/Tailwag/releases/tag/care-v0.1.0-alpha.4) with the source archive and SHA256SUMS.txt. GitHub reports source asset SHA-256 `9da015d70c9b359a4b14f261c938e0168c08f1d4c4f45c89e709a8155f3bd5f7`. Subsequent documentation does not move the verified tag. No live deployment, real signed agreement, email delivery, payment, scanner or encrypted off-host restoration was performed. Broader document/signature and object-level permission acceptance remains open.

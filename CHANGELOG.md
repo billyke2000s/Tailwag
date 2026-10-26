@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased — care-v0.1.0-alpha.4
+## Unreleased
+
+## care-v0.1.0-alpha.4 — 24 October 2026 · evaluation prerelease
 
 - Add a bounded HTML-to-PDF worker with restricted resources and a reduced child environment.
 - Isolate reviewed server print previews and verify real exports, readable fonts and resource rejection.

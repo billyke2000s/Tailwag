@@ -4,7 +4,7 @@ TailWag Animal Care adapts a friend's TailWag prototype into a maintainable anim
 
 ## Confirmed context
 
-England; dogs and cats; rescue, rehoming, fostering and permanent sanctuary care; no hosting selected. Council, legal entity, actual premises, licensed activities, capacity, staffing, budget and domain remain unconfirmed. These are configuration and launch decisions, not inferred facts.
+England; dogs and cats; rescue, rehoming, fostering and permanent sanctuary care; no hosting selected. Council, legal entity, actual premises, licensed activities, capacity, staffing, budget and domain remain unconfirmed. The owner confirmed that no named organisation is identified yet: develop a configurable England platform without inventing organisation details. These are configuration and launch decisions, not inferred facts.
 
 ## Outcomes
 
