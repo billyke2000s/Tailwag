@@ -1,7 +1,7 @@
 Django==5.2.18
 Pillow==13.0.0
 gunicorn==23.0.0
-psycopg[binary]==3.3.6
+psycopg[binary]==3.3.8
 psycopg2-binary==2.9.13
 cheroot==11.1.2
 lxml==6.1.3
